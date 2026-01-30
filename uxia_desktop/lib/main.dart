@@ -16,10 +16,6 @@ class Uxia extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF3B82F6)),
         useMaterial3: true,
       ),
-      // EJERCICIO 2: Reemplaza HomeView por tu LoginView cuando lo crees.
-      // Pista: crea una clase LoginView y asigna home: const LoginView().
-
-    
       home: const LoginView(),
     );
   }
