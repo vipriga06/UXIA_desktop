@@ -88,7 +88,7 @@ class LogoHeader extends StatelessWidget {
     final isMobile = MediaQuery.of(context).size.width < 600;
     return SvgPicture.asset(
       'assets/logos/logo_completo.svg',
-      height: isMobile ? 80 : 150,
+      height: isMobile ? 100 : 220,
       fit: BoxFit.contain,
     );
   }
@@ -187,7 +187,7 @@ class _LoginViewState extends State<LoginView> {
     
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: isMobile ? 80 : 100,
+        toolbarHeight: isMobile ? 120 : 260,
         title: const LogoHeader(),
         centerTitle: true,
       ),
