@@ -1,17 +1,110 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
-void main() => runApp(const Uxia());
+void main() => runApp(const Aida());
 
-class Uxia extends StatelessWidget {
-  const Uxia({super.key});
+// ============================================================================
+// MODELS
+// ============================================================================
+
+class LoginCredentials {
+  String urlServidor;
+  String nomUsuari;
+  String contrasenya;
+
+  LoginCredentials({
+    this.urlServidor = '',
+    this.nomUsuari = '',
+    this.contrasenya = '',
+  });
+}
+
+// ============================================================================
+// SERVICES
+// ============================================================================
+
+class PreferencesService {
+  static const _urlKey = 'url';
+  static const _usuariKey = 'usuari';
+  static const _contrasenyaKey = 'contrasenya';
+
+  Future<LoginCredentials> carregarDades() async {
+    final prefs = await SharedPreferences.getInstance();
+    return LoginCredentials(
+      urlServidor: prefs.getString(_urlKey) ?? '',
+      nomUsuari: prefs.getString(_usuariKey) ?? '',
+      contrasenya: prefs.getString(_contrasenyaKey) ?? '',
+    );
+  }
+
+  Future<void> guardarDades(LoginCredentials credencials) async {
+    final prefs = await SharedPreferences.getInstance();
+    await Future.wait([
+      prefs.setString(_urlKey, credencials.urlServidor),
+      prefs.setString(_usuariKey, credencials.nomUsuari),
+      prefs.setString(_contrasenyaKey, credencials.contrasenya),
+    ]);
+  }
+}
+
+// ============================================================================
+// WIDGETS
+// ============================================================================
+
+class InputField extends StatelessWidget {
+  final TextEditingController controller;
+  final String label;
+  final bool obscureText;
+  final IconData icon;
+
+  const InputField({
+    super.key,
+    required this.controller,
+    required this.label,
+    this.obscureText = false,
+    required this.icon,
+  });
 
   @override
   Widget build(BuildContext context) {
-    const String appTitle = 'Uxia Administrator';
+    return TextField(
+      controller: controller,
+      obscureText: obscureText,
+      decoration: InputDecoration(
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        labelText: label,
+        prefixIcon: Icon(icon),
+      ),
+    );
+  }
+}
 
+class LogoHeader extends StatelessWidget {
+  const LogoHeader({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 600;
+    return SvgPicture.asset(
+      'assets/logos/logo_completo.svg',
+      height: isMobile ? 80 : 150,
+      fit: BoxFit.contain,
+    );
+  }
+}
+
+// ============================================================================
+// APP ROOT
+// ============================================================================
+
+class Aida extends StatelessWidget {
+  const Aida({super.key});
+
+  @override
+  Widget build(BuildContext context) {
     return MaterialApp(
-      title: appTitle,
+      title: 'A.I.D.A administrator',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF3B82F6)),
@@ -21,6 +114,11 @@ class Uxia extends StatelessWidget {
     );
   }
 }
+
+// ============================================================================
+// LOGIN VIEW
+// ============================================================================
+
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
 
@@ -29,32 +127,19 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
-  late TextEditingController _urlController;
-  late TextEditingController _usuariController;
-  late TextEditingController _contrasenyaController;
-  late recordarDades _dades;
+  late final PreferencesService _preferencesService;
+  late final TextEditingController _urlController;
+  late final TextEditingController _usuariController;
+  late final TextEditingController _contrasenyaController;
 
   @override
   void initState() {
     super.initState();
-    _dades = recordarDades('', '', '');
+    _preferencesService = PreferencesService();
     _urlController = TextEditingController();
     _usuariController = TextEditingController();
     _contrasenyaController = TextEditingController();
     _carregarDades();
-  }
-
-  Future<void> _carregarDades() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _dades.urlServidor = prefs.getString('url') ?? '';
-      _dades.nomUsuari = prefs.getString('usuari') ?? '';
-      _dades.contrasenya = prefs.getString('contrasenya') ?? '';
-      
-      _urlController.text = _dades.urlServidor;
-      _usuariController.text = _dades.nomUsuari;
-      _contrasenyaController.text = _dades.contrasenya;
-    });
   }
 
   @override
@@ -65,87 +150,150 @@ class _LoginViewState extends State<LoginView> {
     super.dispose();
   }
 
+  Future<void> _carregarDades() async {
+    final credencials = await _preferencesService.carregarDades();
+    setState(() {
+      _urlController.text = credencials.urlServidor;
+      _usuariController.text = credencials.nomUsuari;
+      _contrasenyaController.text = credencials.contrasenya;
+    });
+  }
+
   Future<void> _guardarDades() async {
-    final prefs = await SharedPreferences.getInstance();
-    _dades.urlServidor = _urlController.text;
-    _dades.nomUsuari = _usuariController.text;
-    _dades.contrasenya = _contrasenyaController.text;
-    
-    await prefs.setString('url', _dades.urlServidor);
-    await prefs.setString('usuari', _dades.nomUsuari);
-    await prefs.setString('contrasenya', _dades.contrasenya);
+    final credencials = LoginCredentials(
+      urlServidor: _urlController.text,
+      nomUsuari: _usuariController.text,
+      contrasenya: _contrasenyaController.text,
+    );
+    await _preferencesService.guardarDades(credencials);
+  }
+
+  void _mostrarDialogLogin() {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => _LoginDialog(
+        urlController: _urlController,
+        usuariController: _usuariController,
+        contrasenyaController: _contrasenyaController,
+        onEntrar: _guardarDades,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 600;
+    final screenWidth = MediaQuery.of(context).size.width;
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Inici de sessió'),
+        toolbarHeight: isMobile ? 80 : 100,
+        title: const LogoHeader(),
+        centerTitle: true,
       ),
       body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: const Center(child: Text('Inici de sessió')),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(
-                      controller: _urlController,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'URL del servidor',
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: _usuariController,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Nom d\'usuari',
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: _contrasenyaController,
-                      obscureText: true,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Contrasenya',
-                      ),
-                    ),
-                  ],
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: isMobile ? 16.0 : 32.0,
+              vertical: isMobile ? 24.0 : 32.0,
+            ),
+            child: SizedBox(
+              width: isMobile ? screenWidth - 32 : 280,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(
+                    vertical: isMobile ? 16 : 20,
+                    horizontal: isMobile ? 24 : 32,
+                  ),
                 ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Cancelar'),
+                onPressed: _mostrarDialogLogin,
+                child: Text(
+                  'Logejar-se',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontSize: isMobile ? 16 : 18,
+                    fontWeight: FontWeight.w600,
                   ),
-                  FilledButton(
-                    onPressed: () {
-                      _guardarDades();
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('Entrar'),
-                  ),
-                ],
+                ),
               ),
-            );
-          },
-          child: const Text('Logejar-se'),
+            ),
+          ),
         ),
       ),
     );
   }
 }
 
+// ============================================================================
+// LOGIN DIALOG
+// ============================================================================
 
-class recordarDades {
-  String urlServidor = '';
-  String nomUsuari = '';
-  String contrasenya = '';
+class _LoginDialog extends StatelessWidget {
+  final TextEditingController urlController;
+  final TextEditingController usuariController;
+  final TextEditingController contrasenyaController;
+  final Future<void> Function() onEntrar;
 
-  recordarDades(this.urlServidor, this.nomUsuari, this.contrasenya);
+  const _LoginDialog({
+    required this.urlController,
+    required this.usuariController,
+    required this.contrasenyaController,
+    required this.onEntrar,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 600;
+
+    return AlertDialog(
+      title: const Center(child: Text('Inici de sessió')),
+      contentPadding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 16 : 24,
+        vertical: isMobile ? 16 : 20,
+      ),
+      content: SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: isMobile ? 280 : 400,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              InputField(
+                controller: urlController,
+                label: 'URL del servidor',
+                icon: Icons.cloud,
+              ),
+              SizedBox(height: isMobile ? 12 : 16),
+              InputField(
+                controller: usuariController,
+                label: 'Nom d\'usuari',
+                icon: Icons.person,
+              ),
+              SizedBox(height: isMobile ? 12 : 16),
+              InputField(
+                controller: contrasenyaController,
+                label: 'Contrasenya',
+                obscureText: true,
+                icon: Icons.lock,
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancelar'),
+        ),
+        FilledButton(
+          onPressed: () async {
+            await onEntrar();
+            Navigator.of(context).pop();
+          },
+          child: const Text('Entrar'),
+        ),
+      ],
+    );
+  }
 }
