@@ -107,8 +107,14 @@ class Aida extends StatelessWidget {
       title: 'A.I.D.A administrator',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF3B82F6)),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF8bc6cc),
+          secondary: const Color(0xFF476568),
+          tertiary: const Color(0xFFffffff),
+          brightness: Brightness.light,
+        ),
         useMaterial3: true,
+        scaffoldBackgroundColor: const Color(0xFFffffff),
       ),
       home: const LoginView(),
     );
