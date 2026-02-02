@@ -193,7 +193,7 @@ class _LoginViewState extends State<LoginView> {
     
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: isMobile ? 120 : 260,
+        toolbarHeight: isMobile ? 88 : 160,
         title: const LogoHeader(),
         centerTitle: true,
       ),
