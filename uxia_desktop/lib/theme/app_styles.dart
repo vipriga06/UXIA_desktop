@@ -56,15 +56,7 @@ class AppTheme {
       ),
       useMaterial3: true,
       scaffoldBackgroundColor: const Color(0xFFF8FAFB),
-      fontFamily: 'DIN Next W1G',
-      textTheme: const TextTheme(
-        headlineSmall: TextStyle(fontFamily: 'Valorant'),
-        headlineMedium: TextStyle(fontFamily: 'Valorant'),
-        headlineLarge: TextStyle(fontFamily: 'Valorant'),
-        titleLarge: TextStyle(fontFamily: 'Valorant'),
-        titleMedium: TextStyle(fontFamily: 'Valorant'),
-        titleSmall: TextStyle(fontFamily: 'Valorant'),
-      ),
+      fontFamily: 'dinnextw1g',
       splashFactory: InkSparkle.splashFactory,
       appBarTheme: const AppBarTheme(
         elevation: 0,

@@ -65,12 +65,9 @@ flutter:
     - assets/web/
 
   fonts:
-    - family: Valorant
+    - family: dinnextw1g
       fonts:
-        - asset: assets/fonts/Valorant.ttf
-    - family: DIN Next W1G
-      fonts:
-        - asset: assets/fonts/dinnextw1g.otf
+        - asset: assets/fonts/dinnextw1g.ttf
 
 flutter_launcher_icons:
   android: true
