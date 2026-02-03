@@ -36,9 +36,9 @@ class AppTextStyles {
 
   static TextStyle? headlineSmall(BuildContext context, {double? fontSize}) {
     return Theme.of(context).textTheme.headlineSmall?.copyWith(
-          fontSize: fontSize,
-          fontWeight: FontWeight.w600,
-        );
+      fontSize: fontSize,
+      fontWeight: FontWeight.w600,
+    );
   }
 }
 
@@ -70,7 +70,10 @@ class AppTheme {
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: borderRadius,
-          side: BorderSide(color: AppColors.primary.withValues(alpha: 0.1), width: 1),
+          side: BorderSide(
+            color: AppColors.primary.withValues(alpha: 0.1),
+            width: 1,
+          ),
         ),
         elevation: 8,
         shadowColor: AppColors.primary.withValues(alpha: 0.08),
@@ -84,72 +87,87 @@ class AppTheme {
         ),
         border: OutlineInputBorder(
           borderRadius: borderRadius,
-          borderSide: BorderSide(color: AppColors.primary.withValues(alpha: 0.12), width: 1),
+          borderSide: BorderSide(
+            color: AppColors.primary.withValues(alpha: 0.12),
+            width: 1,
+          ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: borderRadius,
-          borderSide: BorderSide(color: AppColors.primary.withValues(alpha: 0.12), width: 1),
+          borderSide: BorderSide(
+            color: AppColors.primary.withValues(alpha: 0.12),
+            width: 1,
+          ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: borderRadius,
-          borderSide: BorderSide(color: AppColors.primary.withValues(alpha: 0.5), width: 1.5),
+          borderSide: BorderSide(
+            color: AppColors.primary.withValues(alpha: 0.5),
+            width: 1.5,
+          ),
         ),
-        labelStyle: TextStyle(color: AppColors.secondary.withValues(alpha: 0.7)),
+        labelStyle: TextStyle(
+          color: AppColors.secondary.withValues(alpha: 0.7),
+        ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          elevation: 2,
-          shadowColor: AppColors.primary.withValues(alpha: 0.15),
-          backgroundColor: AppColors.background.withValues(alpha: 0.85),
-          foregroundColor: AppColors.secondary,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(16)),
-          ),
-          side: BorderSide(color: AppColors.primary.withValues(alpha: 0.2), width: 1),
-          animationDuration: const Duration(milliseconds: 140),
-        ).copyWith(
-          overlayColor: MaterialStateProperty.resolveWith<Color?>(
-            (states) {
-              if (states.contains(MaterialState.pressed)) {
-                return AppColors.primary.withValues(alpha: 0.15);
-              }
-              if (states.contains(MaterialState.hovered)) {
-                return AppColors.primary.withValues(alpha: 0.08);
-              }
-              return null;
-            },
-          ),
-          elevation: MaterialStateProperty.resolveWith<double>(
-            (states) => states.contains(MaterialState.pressed) ? 1 : 2,
-          ),
-        ),
+        style:
+            ElevatedButton.styleFrom(
+              elevation: 2,
+              shadowColor: AppColors.primary.withValues(alpha: 0.15),
+              backgroundColor: AppColors.background.withValues(alpha: 0.85),
+              foregroundColor: AppColors.secondary,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(16)),
+              ),
+              side: BorderSide(
+                color: AppColors.primary.withValues(alpha: 0.2),
+                width: 1,
+              ),
+              animationDuration: const Duration(milliseconds: 140),
+            ).copyWith(
+              overlayColor: WidgetStateProperty.resolveWith<Color?>((states) {
+                if (states.contains(WidgetState.pressed)) {
+                  return AppColors.primary.withValues(alpha: 0.15);
+                }
+                if (states.contains(WidgetState.hovered)) {
+                  return AppColors.primary.withValues(alpha: 0.08);
+                }
+                return null;
+              }),
+              elevation: WidgetStateProperty.resolveWith<double>(
+                (states) => states.contains(WidgetState.pressed) ? 1 : 2,
+              ),
+            ),
       ),
       filledButtonTheme: FilledButtonThemeData(
-        style: FilledButton.styleFrom(
-          elevation: 2,
-          shadowColor: AppColors.primary.withValues(alpha: 0.15),
-          backgroundColor: AppColors.primary.withValues(alpha: 0.85),
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(16)),
-          ),
-          side: BorderSide(color: AppColors.primary.withValues(alpha: 0.3), width: 1),
-          animationDuration: const Duration(milliseconds: 140),
-        ).copyWith(
-          overlayColor: MaterialStateProperty.resolveWith<Color?>(
-            (states) {
-              if (states.contains(MaterialState.pressed)) {
-                return Colors.white.withValues(alpha: 0.15);
-              }
-              if (states.contains(MaterialState.hovered)) {
-                return Colors.white.withValues(alpha: 0.08);
-              }
-              return null;
-            },
-          ),
-          elevation: MaterialStateProperty.resolveWith<double>(
-            (states) => states.contains(MaterialState.pressed) ? 1 : 2,
-          ),
-        ),
+        style:
+            FilledButton.styleFrom(
+              elevation: 2,
+              shadowColor: AppColors.primary.withValues(alpha: 0.15),
+              backgroundColor: AppColors.primary.withValues(alpha: 0.85),
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(16)),
+              ),
+              side: BorderSide(
+                color: AppColors.primary.withValues(alpha: 0.3),
+                width: 1,
+              ),
+              animationDuration: const Duration(milliseconds: 140),
+            ).copyWith(
+              overlayColor: WidgetStateProperty.resolveWith<Color?>((states) {
+                if (states.contains(WidgetState.pressed)) {
+                  return Colors.white.withValues(alpha: 0.15);
+                }
+                if (states.contains(WidgetState.hovered)) {
+                  return Colors.white.withValues(alpha: 0.08);
+                }
+                return null;
+              }),
+              elevation: WidgetStateProperty.resolveWith<double>(
+                (states) => states.contains(WidgetState.pressed) ? 1 : 2,
+              ),
+            ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
