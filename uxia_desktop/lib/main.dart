@@ -115,6 +115,15 @@ class Aida extends StatelessWidget {
         ),
         useMaterial3: true,
         scaffoldBackgroundColor: const Color(0xFFffffff),
+        fontFamily: 'DIN Next W1G',
+        textTheme: const TextTheme(
+          headlineSmall: TextStyle(fontFamily: 'Valorant'),
+          headlineMedium: TextStyle(fontFamily: 'Valorant'),
+          headlineLarge: TextStyle(fontFamily: 'Valorant'),
+          titleLarge: TextStyle(fontFamily: 'Valorant'),
+          titleMedium: TextStyle(fontFamily: 'Valorant'),
+          titleSmall: TextStyle(fontFamily: 'Valorant'),
+        ),
       ),
       home: const LoginView(),
     );
