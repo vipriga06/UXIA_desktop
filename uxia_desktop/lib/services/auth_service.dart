@@ -13,23 +13,20 @@ class AuthService implements IAuthService {
     String username,
     String password,
   ) async {
-    // TODO: Implementar llamada real al servidor
-    // Mientras tanto, simular que todos los usuarios son inválidos
     await Future.delayed(const Duration(seconds: 1));
-
-    // Retornar null para indicar que el login falló
+    // TODO: Cridar API real del servidor
     return null;
   }
 
   @override
   Future<void> logout() async {
-    // TODO: Implementar limpieza de sesión
     await Future.delayed(const Duration(milliseconds: 500));
+    // TODO: Netejar sessió
   }
 
   @override
   Future<bool> isAuthenticated() async {
-    // TODO: Verificar token válido
+    // TODO: Verificar token
     return false;
   }
 }

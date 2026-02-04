@@ -1,4 +1,3 @@
-/// Model for login credentials
 class LoginCredentials {
   final String url;
   final String username;
@@ -23,8 +22,7 @@ class LoginCredentials {
   bool get isValid =>
       url.isNotEmpty && username.isNotEmpty && password.isNotEmpty && isValidUrl;
 
-  /// Valida que la URL tenga el formato correcto: http://IP:puerto
-  /// Ejemplo: http://127.0.0.2:3000
+  // Format vàlid: http://IP:port (ex: http://127.0.0.2:3000)
   bool get isValidUrl {
     if (url.isEmpty) return false;
     
@@ -36,7 +34,6 @@ class LoginCredentials {
     return urlPattern.hasMatch(url.trim());
   }
 
-  /// Retorna un mensaje de error si la URL no es válida
   String? get urlError {
     if (url.isEmpty) return null;
     if (!isValidUrl) {

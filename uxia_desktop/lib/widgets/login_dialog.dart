@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../widgets/input_field.dart';
 import '../theme/app_styles.dart';
 
-/// Login dialog widget (Single Responsibility Principle)
 class LoginDialog extends StatelessWidget {
   final TextEditingController urlController;
   final TextEditingController usernameController;

@@ -7,8 +7,6 @@ import '../core/interfaces/i_preferences_service.dart';
 import '../services/preferences_service.dart';
 import '../models/login_credentials.dart';
 
-/// Login view widget (Single Responsibility: Login UI and orchestration)
-/// Follows Dependency Inversion: depends on IPreferencesService interface
 class LoginView extends StatefulWidget {
   final IPreferencesService? preferencesService;
 
@@ -36,7 +34,6 @@ class _LoginViewState extends State<LoginView>
     _loadSavedCredentials();
   }
 
-  /// Initialize services (Dependency Inversion Principle)
   Future<void> _initializeServices() async {
     if (widget.preferencesService != null) {
       _preferencesService = widget.preferencesService!;
@@ -45,7 +42,6 @@ class _LoginViewState extends State<LoginView>
     }
   }
 
-  /// Initialize animations
   void _initializeAnimations() {
     _blurController = AnimationController(
       duration: const Duration(milliseconds: 600),
@@ -58,7 +54,6 @@ class _LoginViewState extends State<LoginView>
     _blurController.forward();
   }
 
-  /// Load saved credentials from preferences
   Future<void> _loadSavedCredentials() async {
     final credentials = await _preferencesService.loadCredentials();
     if (credentials.isNotEmpty && mounted) {
@@ -68,7 +63,6 @@ class _LoginViewState extends State<LoginView>
     }
   }
 
-  /// Save credentials and perform login
   Future<void> _handleLogin() async {
     final credentials = LoginCredentials(
       url: _urlController.text,
@@ -76,7 +70,6 @@ class _LoginViewState extends State<LoginView>
       password: _passwordController.text,
     );
 
-    // Validar que todos los campos estén llenos
     if (credentials.url.isEmpty || 
         credentials.username.isEmpty || 
         credentials.password.isEmpty) {
@@ -84,7 +77,6 @@ class _LoginViewState extends State<LoginView>
       return;
     }
 
-    // Validar formato de URL
     if (!credentials.isValidUrl) {
       _showErrorDialog(credentials.urlError ?? 'Format d\'URL invàlid');
       return;
@@ -92,19 +84,16 @@ class _LoginViewState extends State<LoginView>
 
     await _preferencesService.saveCredentials(credentials);
 
-    // Cerrar el diálogo de login
     if (mounted) {
       Navigator.of(context).pop();
     }
 
-    // Simular intento de login (siempre fallará hasta que esté la API)
-    // Mostrar mensaje de error
+    // TODO: Com no hi ha encara servidor, mostrem error directament
     if (mounted) {
       _showErrorDialog('Usuari no vàlid. El servidor encara no està disponible.');
     }
   }
 
-  /// Show login dialog with animations
   void _showLoginDialog() {
     showGeneralDialog(
       context: context,
