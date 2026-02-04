@@ -14,16 +14,11 @@ class AuthService implements IAuthService {
     String password,
   ) async {
     // TODO: Implementar llamada real al servidor
+    // Mientras tanto, simular que todos los usuarios son inválidos
     await Future.delayed(const Duration(seconds: 1));
 
-    // Simulación
-    return User(
-      id: '1',
-      username: username,
-      email: '$username@example.com',
-      token: 'mock_token_${DateTime.now().millisecondsSinceEpoch}',
-      loginTime: DateTime.now(),
-    );
+    // Retornar null para indicar que el login falló
+    return null;
   }
 
   @override

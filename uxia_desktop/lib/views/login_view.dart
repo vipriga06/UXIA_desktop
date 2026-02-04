@@ -76,15 +76,31 @@ class _LoginViewState extends State<LoginView>
       password: _passwordController.text,
     );
 
-    if (!credentials.isValid) {
-      _showErrorSnackbar('Per favor, omple tots els camps');
+    // Validar que todos los campos estén llenos
+    if (credentials.url.isEmpty || 
+        credentials.username.isEmpty || 
+        credentials.password.isEmpty) {
+      _showErrorDialog('Per favor, omple tots els camps');
+      return;
+    }
+
+    // Validar formato de URL
+    if (!credentials.isValidUrl) {
+      _showErrorDialog(credentials.urlError ?? 'Format d\'URL invàlid');
       return;
     }
 
     await _preferencesService.saveCredentials(credentials);
 
+    // Cerrar el diálogo de login
     if (mounted) {
-      _showSuccessSnackbar('Credencials guardades correctament');
+      Navigator.of(context).pop();
+    }
+
+    // Simular intento de login (siempre fallará hasta que esté la API)
+    // Mostrar mensaje de error
+    if (mounted) {
+      _showErrorDialog('Usuari no vàlid. El servidor encara no està disponible.');
     }
   }
 
@@ -135,6 +151,24 @@ class _LoginViewState extends State<LoginView>
             );
           },
           child: child,
+        );
+      },
+    );
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Acceptar'),
+            ),
+          ],
         );
       },
     );

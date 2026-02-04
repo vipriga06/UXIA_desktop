@@ -67,12 +67,7 @@ class LoginDialog extends StatelessWidget {
             child: const Text('Cancel·lar'),
           ),
           FilledButton(
-            onPressed: () {
-              onSubmit();
-              if (context.mounted) {
-                Navigator.of(context).pop();
-              }
-            },
+            onPressed: onSubmit,
             child: const Text('Entrar'),
           ),
         ],
