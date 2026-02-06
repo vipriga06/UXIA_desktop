@@ -49,6 +49,11 @@ Normalment el servidor està allotjat a:
 https://uxia3.ieti.site
 ```
 
+**Ports de Producció:**
+- **HTTPS**: 443 (recomanat)
+- **HTTP**: 80
+- El servidor intern corre en el port 3000, però està redirigit automàticament
+
 En aquest cas, només cal que introdueixis aquesta URL a l'inici de sessió.
 
 ### Servidor Local (Desenvolupament)
