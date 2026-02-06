@@ -1,14 +1,21 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'logo_widget.dart';
+import 'services/settings_manager.dart';
 
-void main() => runApp(const LaMenuApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final settingsManager = SettingsManager();
+  await settingsManager.initialize();
+  runApp(LaMenuApp(settingsManager: settingsManager));
+}
 
 class LaMenuApp extends StatelessWidget {
-  const LaMenuApp({super.key});
+  final SettingsManager settingsManager;
+
+  const LaMenuApp({super.key, required this.settingsManager});
 
   @override
   Widget build(BuildContext context) {
@@ -21,13 +28,15 @@ class LaMenuApp extends StatelessWidget {
         scaffoldBackgroundColor: const Color(0xFFF8FAFB),
         fontFamily: 'dinnextw1g',
       ),
-      home: const PantallaLogin(),
+      home: PantallaLogin(settingsManager: settingsManager),
     );
   }
 }
 
 class PantallaLogin extends StatefulWidget {
-  const PantallaLogin({super.key});
+  final SettingsManager settingsManager;
+
+  const PantallaLogin({super.key, required this.settingsManager});
 
   @override
   State<PantallaLogin> createState() => _EstatPantallaLogin();
@@ -46,11 +55,9 @@ class _EstatPantallaLogin extends State<PantallaLogin> {
   }
 
   Future<void> _carregarCredencials() async {
-    final prefs = await SharedPreferences.getInstance();
+    final url = await widget.settingsManager.getUrl();
     setState(() {
-      _controladorUrl.text = prefs.getString('url') ?? '';
-      _controladorUsuari.text = prefs.getString('username') ?? '';
-      _controladorContrasenya.text = prefs.getString('password') ?? '';
+      _controladorUrl.text = url ?? '';
     });
   }
 
@@ -85,11 +92,8 @@ class _EstatPantallaLogin extends State<PantallaLogin> {
       return;
     }
 
-    // Guardar credencials
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('url', url);
-    await prefs.setString('username', usuari);
-    await prefs.setString('password', contrasenya);
+    // Guardar URL
+    await widget.settingsManager.saveUrl(url);
 
     // Tancar diàleg
     if (mounted) {
@@ -108,7 +112,7 @@ class _EstatPantallaLogin extends State<PantallaLogin> {
     }
 
     // Obtenir la URL correcta que va funcionar amb el port correcte
-    final urlCorrecta = prefs.getString('url') ?? url;
+    final urlCorrecta = await widget.settingsManager.getUrl() ?? url;
 
     // Si no és email, buscar l'email real per l'usuari
     String email = usuari;
@@ -134,12 +138,43 @@ class _EstatPantallaLogin extends State<PantallaLogin> {
 
     // Guardar token si arriba
     if (resultat['token'] != null) {
-      await prefs.setString('token', resultat['token']);
+      await widget.settingsManager.saveToken(resultat['token']);
     }
 
     if (mounted) {
-      _mostrarError('Login correcte.');
+      // Mostrar mensatge d'èxit i navegar a pantalla principal
+      _mostrarMissatgeINavegar('Login correcte', urlCorrecta, resultat['token']);
     }
+  }
+
+  void _mostrarMissatgeINavegar(String missatge, String url, String token) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Login correcte'),
+          content: Text(missatge),
+        );
+      },
+    );
+
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      if (!mounted) {
+        return;
+      }
+      Navigator.pop(context);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PantallaPrincipal(
+            settingsManager: widget.settingsManager,
+            urlServidor: url,
+            token: token,
+          ),
+        ),
+      );
+    });
   }
 
   // Comprovar si es connecta al servidor
@@ -180,8 +215,7 @@ class _EstatPantallaLogin extends State<PantallaLogin> {
         // Si respon amb codi 200-299 és vàlid
         if (resposta.statusCode >= 200 && resposta.statusCode < 300) {
           // Guardar la URL correcta
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setString('url', urlProva);
+          await widget.settingsManager.saveUrl(urlProva);
           _controladorUrl.text = urlProva;
           if (kDebugMode) {
             print('✓ Connexió exitosa amb: $urlProva');
@@ -206,7 +240,7 @@ class _EstatPantallaLogin extends State<PantallaLogin> {
     String password,
   ) async {
     try {
-      final url = Uri.parse('$urlBase/api/users/login');
+      final url = Uri.parse('$urlBase/api/admin/usuaris/login');
       if (kDebugMode) {
         print('Fent login a: $url');
         print('Email: $email');
@@ -423,6 +457,522 @@ class _EstatPantallaLogin extends State<PantallaLogin> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class PantallaPrincipal extends StatefulWidget {
+  final SettingsManager settingsManager;
+  final String urlServidor;
+  final String token;
+
+  const PantallaPrincipal({
+    super.key,
+    required this.settingsManager,
+    required this.urlServidor,
+    required this.token,
+  });
+
+  @override
+  State<PantallaPrincipal> createState() => _EstatPantallaPrincipal();
+}
+
+class _EstatPantallaPrincipal extends State<PantallaPrincipal> {
+  @override
+  Widget build(BuildContext context) {
+    bool esMobil = MediaQuery.of(context).size.width < 600;
+
+    return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: esMobil ? 60 : 90,
+        title: const WidgetLogo(),
+        centerTitle: true,
+        backgroundColor: const Color(0xFF8bc6cc),
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'Menú Principal',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 32),
+              SizedBox(
+                width: esMobil ? double.infinity : 300,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => GestioUsuaris(
+                          settingsManager: widget.settingsManager,
+                          urlServidor: widget.urlServidor,
+                          token: widget.token,
+                        ),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.people),
+                  label: const Text('Gestionar Usuaris'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: esMobil ? double.infinity : 300,
+                child: ElevatedButton.icon(
+                  onPressed: _verificarToken,
+                  icon: const Icon(Icons.check_circle),
+                  label: const Text('Verificar Token'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: esMobil ? double.infinity : 300,
+                child: ElevatedButton.icon(
+                  onPressed: _ferLogout,
+                  icon: const Icon(Icons.logout),
+                  label: const Text('Logout'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _verificarToken() async {
+    try {
+      final url = Uri.parse('${widget.urlServidor}/api/admin/usuaris/testtoken');
+      final resposta = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer ${widget.token}',
+        },
+      ).timeout(const Duration(seconds: 10));
+
+      if (resposta.statusCode == 200) {
+        final data = jsonDecode(resposta.body);
+        final info = data is Map ? (data['data'] as Map?) : null;
+        final nickname = info?['nickname'] ?? 'Desconegut';
+        final email = info?['email'] ?? 'Desconegut';
+        final role = info?['role'] ?? 'Desconegut';
+        final userId = info?['userId']?.toString() ?? 'Desconegut';
+        final resum = 'ID: $userId\nUsuari: $nickname\nEmail: $email\nRol: $role';
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text('Token Vàlid'),
+                content: Text(resum),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Acceptar'),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      } else {
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text('Error'),
+                content: const Text('Token invàlid o expirat'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Acceptar'),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('Error'),
+              content: Text('Error verificant token: $e'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Acceptar'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }
+  }
+
+  Future<void> _ferLogout() async {
+    try {
+      final url = Uri.parse('${widget.urlServidor}/api/admin/usuaris/logout');
+      final resposta = await http.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer ${widget.token}',
+        },
+      ).timeout(const Duration(seconds: 10));
+
+      if (resposta.statusCode == 200) {
+        // Eliminar token del settings
+        await widget.settingsManager.deleteToken();
+
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text('Logout Correcte'),
+                content: const Text('Has sortit de la sessió correctament'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PantallaLogin(
+                            settingsManager: widget.settingsManager,
+                          ),
+                        ),
+                      );
+                    },
+                    child: const Text('Acceptar'),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      } else {
+        final data = jsonDecode(resposta.body);
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text('Error en Logout'),
+                content: Text(data['message'] ?? 'Error en logout'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Acceptar'),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('Error'),
+              content: Text('Error en logout: $e'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Acceptar'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }
+  }
+}
+
+class GestioUsuaris extends StatefulWidget {
+  final SettingsManager settingsManager;
+  final String urlServidor;
+  final String token;
+
+  const GestioUsuaris({
+    super.key,
+    required this.settingsManager,
+    required this.urlServidor,
+    required this.token,
+  });
+
+  @override
+  State<GestioUsuaris> createState() => _EstatGestioUsuaris();
+}
+
+class _EstatGestioUsuaris extends State<GestioUsuaris> {
+  List<dynamic> usuaris = [];
+  bool estaCargandoUsuaris = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _carregarUsuaris();
+  }
+
+  Future<void> _carregarUsuaris() async {
+    try {
+      final url = Uri.parse('${widget.urlServidor}/api/admin/usuaris');
+      final resposta = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer ${widget.token}',
+        },
+      ).timeout(const Duration(seconds: 10));
+
+      if (resposta.statusCode == 200) {
+        final data = jsonDecode(resposta.body);
+        setState(() {
+          usuaris = data['data'] ?? [];
+          estaCargandoUsuaris = false;
+        });
+      } else {
+        if (mounted) {
+          _mostrarError('Error carregant usuaris: ${resposta.statusCode}');
+        }
+        setState(() {
+          estaCargandoUsuaris = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        _mostrarError('Error carregant usuaris: $e');
+      }
+      setState(() {
+        estaCargandoUsuaris = false;
+      });
+    }
+  }
+
+  Future<void> _crearUsuari() async {
+    final dialogResult = await showDialog<Map<String, String>>(
+      context: context,
+      builder: (context) {
+        final emailCtrl = TextEditingController();
+        final nicknameCtrl = TextEditingController();
+        final passwordCtrl = TextEditingController();
+
+        return AlertDialog(
+          title: const Text('Crear Usuari'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: emailCtrl,
+                decoration: const InputDecoration(labelText: 'Email'),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: nicknameCtrl,
+                decoration: const InputDecoration(labelText: 'Nom d\'usuari'),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: passwordCtrl,
+                decoration: const InputDecoration(labelText: 'Contrasenya'),
+                obscureText: true,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel·lar'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context, {
+                  'email': emailCtrl.text,
+                  'nickname': nicknameCtrl.text,
+                  'password': passwordCtrl.text,
+                });
+              },
+              child: const Text('Crear'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (dialogResult != null) {
+      try {
+        final url = Uri.parse('${widget.urlServidor}/api/admin/usuaris');
+        final resposta = await http.post(
+          url,
+          headers: {
+            'Authorization': 'Bearer ${widget.token}',
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode(dialogResult),
+        ).timeout(const Duration(seconds: 10));
+
+        if (resposta.statusCode == 201) {
+          _carregarUsuaris();
+          if (mounted) {
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (context) {
+                return const AlertDialog(
+                  title: Text('Usuari creat'),
+                  content: Text('Usuari creat correctament'),
+                );
+              },
+            );
+
+            Future.delayed(const Duration(seconds: 1), () {
+              if (mounted) {
+                Navigator.pop(context);
+              }
+            });
+          }
+        } else {
+          final data = jsonDecode(resposta.body);
+          if (mounted) {
+            _mostrarError(data['message'] ?? 'Error creant usuari');
+          }
+        }
+      } catch (e) {
+        if (mounted) {
+          _mostrarError('Error creant usuari: $e');
+        }
+      }
+    }
+  }
+
+  Future<void> _eliminarUsuari(int usuariId) async {
+    try {
+      final url = Uri.parse('${widget.urlServidor}/api/admin/usuaris/$usuariId');
+      final resposta = await http.delete(
+        url,
+        headers: {
+          'Authorization': 'Bearer ${widget.token}',
+        },
+      ).timeout(const Duration(seconds: 10));
+
+      if (resposta.statusCode == 200) {
+        _carregarUsuaris();
+        if (mounted) {
+          _mostrarError('Usuari eliminat correctament');
+        }
+      } else {
+        final data = jsonDecode(resposta.body);
+        if (mounted) {
+          _mostrarError(data['message'] ?? 'Error eliminant usuari');
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        _mostrarError('Error eliminant usuari: $e');
+      }
+    }
+  }
+
+  void _mostrarError(String mensaje) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Missatge'),
+          content: Text(mensaje),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Acceptar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Gestionar Usuaris'),
+        backgroundColor: const Color(0xFF8bc6cc),
+      ),
+      body: estaCargandoUsuaris
+          ? const Center(child: CircularProgressIndicator())
+          : ListView.builder(
+              itemCount: usuaris.length,
+              itemBuilder: (context, index) {
+                final usuari = usuaris[index];
+                return ListTile(
+                  title: Text(usuari['nickname'] ?? 'Sense nom'),
+                  subtitle: Text(usuari['email'] ?? 'Sense email'),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text('Eliminar Usuari'),
+                            content: Text('Segur que vols eliminar ${usuari['nickname']}?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('Cancel·lar'),
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  _eliminarUsuari(usuari['id']);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  foregroundColor: Colors.white,
+                                ),
+                                child: const Text('Eliminar'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _crearUsuari,
+        backgroundColor: const Color(0xFF8bc6cc),
+        child: const Icon(Icons.add),
       ),
     );
   }
