@@ -2,9 +2,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../constants/app_constants.dart';
-import '../models/user_model.dart';
 import 'settings_manager.dart';
-import 'server_discovery.dart';
 
 /// Servicio de autenticación
 class AuthService {
@@ -17,14 +15,14 @@ class AuthService {
   }) : _httpClient = httpClient ?? http.Client();
 
   /// Realiza login de administrador
-  Future<({bool success, String? token, String message})> loginAdmin({
+  Future<({String message, bool success, String? token})> loginAdmin({
     required String urlBase,
     required String email,
     required String password,
   }) async {
     try {
       final url = Uri.parse('$urlBase${AppConstants.apiPath}${AppConstants.adminPath}/login');
-      if (kDebugMode) print('[Auth] Login attempt to: $url');
+      if (kDebugMode) debugPrint('[Auth] Login attempt to: $url');
 
       final response = await _httpClient
           .post(
@@ -42,16 +40,14 @@ class AuthService {
       
       if (data['status'] == 'OK') {
         final token = data['data']?['token'] as String?;
-        return (success: true, token: token, message: data['message'] ?? '');
+        final msg = (data['message'] as String?) ?? '';
+        return (success: true, token: token, message: msg);
       }
 
-      return (
-        success: false,
-        token: null,
-        message: data['message'] as String? ?? 'Error de resposta',
-      );
+      final msg = (data['message'] as String?) ?? 'Error de resposta';
+      return (success: false, token: null, message: msg);
     } catch (e) {
-      if (kDebugMode) print('[Auth] Login error: $e');
+      if (kDebugMode) debugPrint('[Auth] Login error: $e');
       return (
         success: false,
         token: null,
@@ -78,7 +74,7 @@ class AuthService {
       }
       return null;
     } catch (e) {
-      if (kDebugMode) print('[Auth] Error getting email: $e');
+      if (kDebugMode) debugPrint('[Auth] Error getting email: $e');
       return null;
     }
   }
@@ -98,7 +94,7 @@ class AuthService {
 
       return response.statusCode == 200;
     } catch (e) {
-      if (kDebugMode) print('[Auth] Logout error: $e');
+      if (kDebugMode) debugPrint('[Auth] Logout error: $e');
       return false;
     }
   }

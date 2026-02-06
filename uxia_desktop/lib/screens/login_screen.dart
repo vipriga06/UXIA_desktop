@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../constants/app_constants.dart';
-import '../models/user_model.dart';
 import '../services/auth_service.dart';
 import '../services/server_discovery.dart';
 import '../services/settings_manager.dart';
@@ -164,7 +163,7 @@ class _LoginScreenState extends State<LoginScreen> {
           message: '${AppConstants.msgConnectionError}: $e',
         );
       }
-      if (kDebugMode) print('Login error: $e');
+      if (kDebugMode) debugPrint('Login error: $e');
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -187,6 +186,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 decoration: const InputDecoration(
                   labelText: 'URL del servidor',
                   prefixIcon: Icon(Icons.cloud),
+                  border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 16),
@@ -196,6 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 decoration: const InputDecoration(
                   labelText: 'Nom d\'usuari o email',
                   prefixIcon: Icon(Icons.person),
+                  border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 16),

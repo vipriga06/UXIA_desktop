@@ -347,33 +347,40 @@ class _UsersScreenState extends State<_UsersScreen> {
   }
 
   Future<void> _changeRole(User user) async {
+    String selectedRole = user.role;
     final newRole = await showDialog<String>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Canviar Rol'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            RadioListTile(
-              title: const Text('Admin'),
-              value: 'admin',
-              groupValue: user.role,
-              onChanged: (v) => Navigator.pop(context, v),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: const Text('Canviar Rol'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RadioListTile<String>(
+                title: const Text('Admin'),
+                value: 'admin',
+                groupValue: selectedRole,
+                onChanged: (v) => setState(() => selectedRole = v ?? 'admin'),
+              ),
+              RadioListTile<String>(
+                title: const Text('Usuari'),
+                value: 'user',
+                groupValue: selectedRole,
+                onChanged: (v) => setState(() => selectedRole = v ?? 'user'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel·lar'),
             ),
-            RadioListTile(
-              title: const Text('Usuari'),
-              value: 'user',
-              groupValue: user.role,
-              onChanged: (v) => Navigator.pop(context, v),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, selectedRole),
+              child: const Text('Acceptar'),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel·lar'),
-          ),
-        ],
       ),
     );
 

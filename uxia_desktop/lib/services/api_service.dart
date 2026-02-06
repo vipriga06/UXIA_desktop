@@ -26,13 +26,13 @@ class ApiService {
   Future<http.Response> get(String endpoint) async {
     try {
       final url = Uri.parse('$baseUrl$endpoint');
-      if (kDebugMode) print('[GET] $url');
+      if (kDebugMode) debugPrint('[GET] $url');
       
       return await _httpClient
           .get(url, headers: _defaultHeaders())
           .timeout(const Duration(seconds: AppConstants.timeoutSeconds));
     } catch (e) {
-      if (kDebugMode) print('[GET ERROR] $e');
+      if (kDebugMode) debugPrint('[GET ERROR] $e');
       rethrow;
     }
   }
@@ -41,7 +41,7 @@ class ApiService {
   Future<http.Response> post(String endpoint, {required Map<String, dynamic> body}) async {
     try {
       final url = Uri.parse('$baseUrl$endpoint');
-      if (kDebugMode) print('[POST] $url with body: $body');
+      if (kDebugMode) debugPrint('[POST] $url with body: $body');
       
       return await _httpClient
           .post(
@@ -51,7 +51,7 @@ class ApiService {
           )
           .timeout(const Duration(seconds: AppConstants.timeoutSeconds));
     } catch (e) {
-      if (kDebugMode) print('[POST ERROR] $e');
+      if (kDebugMode) debugPrint('[POST ERROR] $e');
       rethrow;
     }
   }
@@ -60,7 +60,7 @@ class ApiService {
   Future<http.Response> patch(String endpoint, {required Map<String, dynamic> body}) async {
     try {
       final url = Uri.parse('$baseUrl$endpoint');
-      if (kDebugMode) print('[PATCH] $url with body: $body');
+      if (kDebugMode) debugPrint('[PATCH] $url with body: $body');
       
       return await _httpClient
           .patch(
@@ -70,7 +70,7 @@ class ApiService {
           )
           .timeout(const Duration(seconds: AppConstants.timeoutSeconds));
     } catch (e) {
-      if (kDebugMode) print('[PATCH ERROR] $e');
+      if (kDebugMode) debugPrint('[PATCH ERROR] $e');
       rethrow;
     }
   }
@@ -79,13 +79,13 @@ class ApiService {
   Future<http.Response> delete(String endpoint) async {
     try {
       final url = Uri.parse('$baseUrl$endpoint');
-      if (kDebugMode) print('[DELETE] $url');
+      if (kDebugMode) debugPrint('[DELETE] $url');
       
       return await _httpClient
           .delete(url, headers: _defaultHeaders())
           .timeout(const Duration(seconds: AppConstants.timeoutSeconds));
     } catch (e) {
-      if (kDebugMode) print('[DELETE ERROR] $e');
+      if (kDebugMode) debugPrint('[DELETE ERROR] $e');
       rethrow;
     }
   }
@@ -103,7 +103,7 @@ class ApiService {
       }
       return null;
     } catch (e) {
-      if (kDebugMode) print('Error getting auth user: $e');
+      if (kDebugMode) debugPrint('Error getting auth user: $e');
       return null;
     }
   }
@@ -123,7 +123,7 @@ class ApiService {
       }
       return [];
     } catch (e) {
-      if (kDebugMode) print('Error getting users: $e');
+      if (kDebugMode) debugPrint('Error getting users: $e');
       rethrow;
     }
   }
@@ -154,7 +154,7 @@ class ApiService {
       }
       return null;
     } catch (e) {
-      if (kDebugMode) print('Error creating user: $e');
+      if (kDebugMode) debugPrint('Error creating user: $e');
       rethrow;
     }
   }
@@ -165,7 +165,7 @@ class ApiService {
       final response = await delete('${AppConstants.apiPath}${AppConstants.adminPath}/$userId');
       return response.statusCode == 200;
     } catch (e) {
-      if (kDebugMode) print('Error deleting user: $e');
+      if (kDebugMode) debugPrint('Error deleting user: $e');
       rethrow;
     }
   }
@@ -186,7 +186,7 @@ class ApiService {
       }
       return null;
     } catch (e) {
-      if (kDebugMode) print('Error updating user role: $e');
+      if (kDebugMode) debugPrint('Error updating user role: $e');
       rethrow;
     }
   }

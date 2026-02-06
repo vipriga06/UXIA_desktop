@@ -44,7 +44,7 @@ class Validators {
     
     final urlToCheck = addScheme(url);
     if (!isValidUrl(urlToCheck)) {
-      if (kDebugMode) print('URL validation failed: $urlToCheck');
+      if (kDebugMode) debugPrint('URL validation failed: $urlToCheck');
       return AppConstants.msgInvalidUrl;
     }
     

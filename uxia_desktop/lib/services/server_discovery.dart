@@ -33,18 +33,18 @@ class ServerDiscovery {
   /// Prueba la conexión a un servidor
   static Future<bool> _testConnection(String url) async {
     try {
-      if (kDebugMode) print('[Server Discovery] Intentando: $url');
+      if (kDebugMode) debugPrint('[Server Discovery] Intentando: $url');
       
       final response = await http
           .get(Uri.parse('$url$_testEndpoint'))
           .timeout(_timeout);
 
       final success = response.statusCode >= 200 && response.statusCode < 300;
-      if (success && kDebugMode) print('[Server Discovery] ✓ Conexión exitosa: $url');
+      if (success && kDebugMode) debugPrint('[Server Discovery] ✓ Conexión exitosa: $url');
       
       return success;
     } catch (e) {
-      if (kDebugMode) print('[Server Discovery] ✗ Error en $url: $e');
+      if (kDebugMode) debugPrint('[Server Discovery] ✗ Error en $url: $e');
       return false;
     }
   }
