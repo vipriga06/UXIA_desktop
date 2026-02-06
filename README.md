@@ -70,9 +70,29 @@ El servidor s'executarà en: `http://localhost:3000`
 
 #### Base de Dades Local
 
-Necessites MySQL corrent amb:
+**Opció 1: MySQL Local**
+```bash
+MYSQL_HOST=127.0.0.1
+MYSQL_PORT=3306
+```
+
+**Opció 2: MySQL Remot (via túnel SSH)**
+
+Primer inicia el túnel SSH:
+```bash
+cd UXIA_server
+./proxmox/proxmoxTunelStart.sh
+```
+
+Després configura:
+```bash
+MYSQL_HOST=127.0.0.1
+MYSQL_PORT=3307  # Túnel SSH al MySQL remot
+```
+
+Credencials necessàries:
 - **Host**: localhost
-- **Port**: 3306  
+- **Port**: 3306 (local) o 3307 (túnel SSH)
 - **Usuari**: uxia_user
 - **Contrasenya**: password
 - **Base de dades**: uxia_db
@@ -109,7 +129,7 @@ Authorization: Bearer EL_TEU_TOKEN_AQUI
 ```bash
 POST /api/admin/usuaris/login
 {
-  "email": "admin@test.com",
+  "email": "admin@uxia.com",
   "password": "admin123"
 }
 ```
@@ -174,7 +194,7 @@ Headers: Authorization: Bearer EL_TEU_TOKEN
 ## �👤 Usuari de Prova
 
 Per provar l'aplicació amb el servidor de producció:
-- **Email**: admin@test.com
+- **Email**: admin@uxia.com
 - **Contrasenya**: admin123
 - **URL**: uxia3.ieti.site
 
