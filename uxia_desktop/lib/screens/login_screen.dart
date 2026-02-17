@@ -20,46 +20,6 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-    // Permite login directo con token
-    Future<void> _loginWithToken(String token) async {
-      const url = 'https://uxia3.ieti.site';
-      try {
-        // Guardar token y url
-        await widget.settingsManager.saveToken(token);
-        await widget.settingsManager.saveUrl(url);
-
-        // Verificar token llamando a getAuthUser
-        final apiService = ApiService(baseUrl: url, token: token);
-        final authUser = await apiService.getAuthUser();
-        if (authUser != null) {
-          if (mounted) {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (_) => HomeScreen(
-                  settingsManager: widget.settingsManager,
-                  urlServidor: url,
-                  token: token,
-                ),
-              ),
-            );
-          }
-        } else {
-          if (mounted) {
-            CommonWidgets.showErrorDialog(
-              context: context,
-              message: 'Token inválido o expirado.',
-            );
-          }
-        }
-      } catch (e) {
-        if (mounted) {
-          CommonWidgets.showErrorDialog(
-            context: context,
-            message: 'Error verificando token: $e',
-          );
-        }
-      }
-    }
   @override
   Widget build(BuildContext context) {
     final isMobile =
@@ -76,19 +36,6 @@ class _LoginScreenState extends State<LoginScreen> {
               icon: const Icon(Icons.login),
               label: const Text('Logejar-se'),
               style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(
-                  vertical: isMobile ? 16 : 20,
-                  horizontal: isMobile ? 24 : 32,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: () => _loginWithToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjJmZDgwNi05NmU1LTRhZWItOTkyNC1mNDlmNjE1N2E1YjYiLCJ0aW1lc3RhbXAiOjE3NzEzNTI0MzkxMzQsImlhdCI6MTc3MTM1MjQzOSwiZXhwIjoxNzcxOTU3MjM5fQ.pgsflap7WgyttFrjhW2dYzp72a4yTjcaVh3B3RNlwlE'),
-              icon: const Icon(Icons.vpn_key),
-              label: const Text('Login con token'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
                 padding: EdgeInsets.symmetric(
                   vertical: isMobile ? 16 : 20,
                   horizontal: isMobile ? 24 : 32,
