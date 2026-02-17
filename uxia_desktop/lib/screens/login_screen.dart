@@ -204,10 +204,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 controller: _passCtrl,
                 label: 'Contrasenya',
                 icon: Icons.lock,
-                obscure: !_showPassword,
+                obscureText: !_showPassword,
                 onToggleObscure: _isLoading
-                    ? null
-                    : () => setState(() => _showPassword = !_showPassword),
+                  ? null
+                  : () => setState(() => _showPassword = !_showPassword),
               ),
             ],
           ),
