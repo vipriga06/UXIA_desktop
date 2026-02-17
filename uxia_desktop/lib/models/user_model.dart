@@ -24,8 +24,13 @@ class User {
 
   /// Convierte JSON a User
   factory User.fromJson(Map<String, dynamic> json) {
+    int parseId(dynamic value) {
+      if (value is int) return value;
+      if (value is String) return int.tryParse(value) ?? 0;
+      return 0;
+    }
     return User(
-      id: json['id'] as int? ?? 0,
+      id: parseId(json['id']),
       email: json['email'] as String? ?? '',
       nickname: json['nickname'] as String? ?? '',
       telefon: json['telefon'] as String?,
@@ -122,8 +127,13 @@ class AuthUser {
   });
 
   factory AuthUser.fromJson(Map<String, dynamic> json) {
+    int parseUserId(dynamic value) {
+      if (value is int) return value;
+      if (value is String) return int.tryParse(value) ?? 0;
+      return 0;
+    }
     return AuthUser(
-      userId: json['userId'] as int? ?? 0,
+      userId: parseUserId(json['userId']),
       nickname: json['nickname'] as String? ?? '',
       email: json['email'] as String? ?? '',
       telefon: json['telefon'] as String?,

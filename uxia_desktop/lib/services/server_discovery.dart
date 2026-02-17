@@ -5,7 +5,7 @@ import '../constants/app_constants.dart';
 /// Servicio de descubrimiento de servidor
 class ServerDiscovery {
   static const _testEndpoint = '/api/users';
-  static const _timeout = Duration(seconds: 3);
+  static const _timeout = Duration(milliseconds: 1500);
 
   /// Encuentra la URL correcta del servidor probando diferentes puertos
   static Future<String?> discoverServer(String urlBase) async {
@@ -20,7 +20,9 @@ class ServerDiscovery {
     }
 
     // Probar puertos conocidos
-    for (final port in AppConstants.defaultPorts) {
+    // Probar primero 443 (HTTPS), luego 80, luego los demás
+    final optimizedPorts = ['443', '80', ...AppConstants.defaultPorts.where((p) => p != '443' && p != '80')];
+    for (final port in optimizedPorts) {
       final testUrl = '$baseUrl:$port';
       if (await _testConnection(testUrl)) {
         return testUrl;

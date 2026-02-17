@@ -119,6 +119,7 @@ TOS: ${_currentUser!.tos ? 'Si' : 'No'}
 
     return Scaffold(
       appBar: CommonWidgets.buildAppBar(title: 'Menú Principal'),
+      backgroundColor: const Color(AppConstants.bgColorValue),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -412,6 +413,7 @@ class _UsersScreenState extends State<_UsersScreen> {
     if (_isLoading) {
       return Scaffold(
         appBar: CommonWidgets.buildAppBar(title: 'Gestionar Usuaris'),
+        backgroundColor: const Color(AppConstants.bgColorValue),
         body: CommonWidgets.loadingWidget(),
       );
     }
@@ -419,6 +421,7 @@ class _UsersScreenState extends State<_UsersScreen> {
     if (_users.isEmpty) {
       return Scaffold(
         appBar: CommonWidgets.buildAppBar(title: 'Gestionar Usuaris'),
+        backgroundColor: const Color(AppConstants.bgColorValue),
         body: CommonWidgets.emptyWidget(message: 'Cap usuari'),
         floatingActionButton: FloatingActionButton(
           onPressed: _createUser,
@@ -430,6 +433,7 @@ class _UsersScreenState extends State<_UsersScreen> {
 
     return Scaffold(
       appBar: CommonWidgets.buildAppBar(title: 'Gestionar Usuaris'),
+      backgroundColor: const Color(AppConstants.bgColorValue),
       body: ListView.builder(
         itemCount: _users.length,
         itemBuilder: (context, index) {
