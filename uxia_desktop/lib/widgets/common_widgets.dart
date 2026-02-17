@@ -63,18 +63,18 @@ class CommonWidgets {
     required TextEditingController controller,
     required String label,
     required IconData icon,
-    bool obscure = false,
+    bool obscureText = false,
     VoidCallback? onToggleObscure,
   }) {
     return TextField(
       controller: controller,
-      obscureText: obscure,
+      obscureText: obscureText,
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: Icon(icon),
         suffixIcon: onToggleObscure != null
             ? IconButton(
-                icon: Icon(obscure ? Icons.visibility_off : Icons.visibility),
+                icon: Icon(obscureText ? Icons.visibility_off : Icons.visibility),
                 onPressed: onToggleObscure,
               )
             : null,
