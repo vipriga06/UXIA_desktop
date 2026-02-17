@@ -150,23 +150,19 @@ class _LoginScreenState extends State<LoginScreen> {
         return;
       }
 
-      // Guardar token
-      if (result.token != null) {
-        await widget.settingsManager.saveToken(result.token!);
+      // Verificar login con token fijo
+      const fixedToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjJmZDgwNi05NmU1LTRhZWItOTkyNC1mNDlmNjE1N2E1YjYiLCJ0aW1lc3RhbXAiOjE3NzEzNTM0ODMwNjQsImlhdCI6MTc3MTM1MzQ4MywiZXhwIjoxNzcxOTU4MjgzfQ.hFtlqTLiEN6xDdJj15cpwQAl3P0gqXhuiNqAQ5sD3aU';
+      final apiService = ApiService(baseUrl: discoveredUrl, token: fixedToken);
+      final authUser = await apiService.getAuthUser();
+      if (authUser == null) {
+        if (mounted) {
+          CommonWidgets.showErrorDialog(
+            context: context,
+            message: 'No se pudo verificar el login con el token fijo.',
+          );
+        }
+        return;
       }
-
-      if (mounted) {
-        // Mostrar diálogo de éxito y navegar
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) => AlertDialog(
-            title: const Text('Login correcte'),
-            content: const Text('Benvingut'),
-          ),
-        );
-
-        await Future.delayed(AppConstants.loginDialogDuration);
         if (mounted) {
           Navigator.of(context).pop(); // Cerrar diálogo
           Navigator.of(context).pushReplacement(
