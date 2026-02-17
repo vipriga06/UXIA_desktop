@@ -96,7 +96,6 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // Agregar esquema si falta
       // Forzar siempre la URL base a https://uxia3.ieti.site
       const url = 'https://uxia3.ieti.site';
       await widget.settingsManager.saveUrl(url);
@@ -109,9 +108,9 @@ class _LoginScreenState extends State<LoginScreen> {
             message: '${AppConstants.msgServerError} $url',
           );
         }
+        setState(() => _isLoading = false);
         return;
       }
-      // Guardar URL descubierta
       await widget.settingsManager.saveUrl(discoveredUrl);
 
       // Obtener email si se proporciona nickname
@@ -128,6 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
               message: 'Usuari no trobat',
             );
           }
+          setState(() => _isLoading = false);
           return;
         }
         email = foundEmail;
@@ -147,6 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
             message: result.message,
           );
         }
+        setState(() => _isLoading = false);
         return;
       }
 
@@ -161,33 +162,32 @@ class _LoginScreenState extends State<LoginScreen> {
             message: 'No se pudo verificar el login con el token fijo.',
           );
         }
+        setState(() => _isLoading = false);
         return;
       }
-        if (mounted) {
-          Navigator.of(context).pop(); // Cerrar diálogo
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (_) => HomeScreen(
-                settingsManager: widget.settingsManager,
-                urlServidor: discoveredUrl,
-                token: result.token!,
-              ),
+
+      if (mounted) {
+        Navigator.of(context).pop(); // Cerrar diálogo
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => HomeScreen(
+              settingsManager: widget.settingsManager,
+              urlServidor: discoveredUrl,
+              token: result.token!,
             ),
-          );
-        }
+          ),
+        );
       }
+      setState(() => _isLoading = false);
     } catch (e) {
       if (mounted) {
         CommonWidgets.showErrorDialog(
           context: context,
           message: '${AppConstants.msgConnectionError}: $e',
         );
-      }
-      if (kDebugMode) debugPrint('Login error: $e');
-    } finally {
-      if (mounted) {
         setState(() => _isLoading = false);
       }
+      if (kDebugMode) debugPrint('Login error: $e');
     }
   }
 
