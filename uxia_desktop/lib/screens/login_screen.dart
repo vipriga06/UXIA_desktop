@@ -189,64 +189,66 @@ class _LoginScreenState extends State<LoginScreen> {
                   border: OutlineInputBorder(),
                 ),
               ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _userCtrl,
-                enabled: !_isLoading,
-                decoration: const InputDecoration(
-                  labelText: 'Nom d\'usuari o email',
-                  prefixIcon: Icon(Icons.person),
-                  border: OutlineInputBorder(),
+              context: context,
+              barrierDismissible: false,
+              builder: (context) => StatefulBuilder(
+                builder: (context, setStateDialog) => AlertDialog(
+                  title: const Text('Inici de sessió'),
+                  content: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextField(
+                          controller: _urlCtrl,
+                          enabled: !_isLoading,
+                          decoration: const InputDecoration(
+                            labelText: 'URL del servidor',
+                            prefixIcon: Icon(Icons.cloud),
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        TextField(
+                          controller: _userCtrl,
+                          enabled: !_isLoading,
+                          decoration: const InputDecoration(
+                            labelText: 'Nom d\'usuari o email',
+                            prefixIcon: Icon(Icons.person),
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        CommonWidgets.secureTextField(
+                          controller: _passCtrl,
+                          label: 'Contrasenya',
+                          icon: Icons.lock,
+                          obscureText: !_showPassword,
+                          onToggleObscure: _isLoading
+                              ? null
+                              : () => setStateDialog(() => _showPassword = !_showPassword),
+                        ),
+                      ],
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: _isLoading ? null : () => Navigator.pop(context),
+                      child: const Text('Cancel·lar'),
+                    ),
+                    ElevatedButton(
+                      onPressed: _isLoading ? null : _handleLogin,
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Text('Entrar'),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 16),
-              CommonWidgets.secureTextField(
-                controller: _passCtrl,
-                label: 'Contrasenya',
-                icon: Icons.lock,
-                obscureText: !_showPassword,
-                onToggleObscure: _isLoading
-                  ? null
-                  : () => setState(() => _showPassword = !_showPassword),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: _isLoading ? null : () => Navigator.pop(context),
-            child: const Text('Cancel·lar'),
-          ),
-          ElevatedButton(
-            onPressed: _isLoading ? null : _handleLogin,
-            child: _isLoading
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text('Entrar'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isMobile = MediaQuery.of(context).size.width < AppConstants.mobileBreakpoint;
-
-    return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: isMobile ? 60 : 90,
-        centerTitle: true,
-        backgroundColor: const Color(AppConstants.primaryColorValue),
-        title: const Text('A.I.D.A Administrator'),
-      ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: ElevatedButton.icon(
+            );
             onPressed: _showLoginDialog,
             icon: const Icon(Icons.login),
             label: const Text('Logejar-se'),
