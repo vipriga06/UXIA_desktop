@@ -113,24 +113,17 @@ class _LoginScreenState extends State<LoginScreen> {
       }
       await widget.settingsManager.saveUrl(discoveredUrl);
 
-      // Obtener email si se proporciona nickname
+      // Permitir login con nickname o email
       var email = _userCtrl.text;
       if (!_userCtrl.text.contains('@')) {
         final foundEmail = await _authService.getEmailFromUsername(
           discoveredUrl,
           _userCtrl.text,
         );
-        if (foundEmail == null) {
-          if (mounted) {
-            CommonWidgets.showErrorDialog(
-              context: context,
-              message: 'Usuari no trobat',
-            );
-          }
-          setState(() => _isLoading = false);
-          return;
+        if (foundEmail != null) {
+          email = foundEmail;
         }
-        email = foundEmail;
+        // Si no se encuentra, intentar login igualmente con el valor introducido
       }
 
       // Login
@@ -151,20 +144,6 @@ class _LoginScreenState extends State<LoginScreen> {
         return;
       }
 
-      // Verificar login con token fijo
-      const fixedToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjJmZDgwNi05NmU1LTRhZWItOTkyNC1mNDlmNjE1N2E1YjYiLCJ0aW1lc3RhbXAiOjE3NzEzNTM0ODMwNjQsImlhdCI6MTc3MTM1MzQ4MywiZXhwIjoxNzcxOTU4MjgzfQ.hFtlqTLiEN6xDdJj15cpwQAl3P0gqXhuiNqAQ5sD3aU';
-      final apiService = ApiService(baseUrl: discoveredUrl, token: fixedToken);
-      final authUser = await apiService.getAuthUser();
-      if (authUser == null) {
-        if (mounted) {
-          CommonWidgets.showErrorDialog(
-            context: context,
-            message: 'No se pudo verificar el login con el token fijo.',
-          );
-        }
-        setState(() => _isLoading = false);
-        return;
-      }
 
       if (mounted) {
         Navigator.of(context).pop(); // Cerrar diálogo
