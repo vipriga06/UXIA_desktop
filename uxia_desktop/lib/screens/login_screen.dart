@@ -43,14 +43,6 @@ class _LoginScreenState extends State<LoginScreen> {
     _loadSavedUrl();
   }
 
-  @override
-  void dispose() {
-    _urlCtrl.dispose();
-    _userCtrl.dispose();
-    _passCtrl.dispose();
-    _authService.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,15 +71,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  @override
-  void initState() {
-    super.initState();
-    // Inyección de dependencias: permite testear y escalar fácilmente
-    _authService =
-        widget.authService ??
-        AuthService(settingsManager: widget.settingsManager);
-    _loadSavedUrl();
-  }
 
   @override
   void dispose() {
