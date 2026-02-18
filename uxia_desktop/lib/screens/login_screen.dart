@@ -4,7 +4,6 @@ import '../constants/app_constants.dart';
 import '../services/auth_service.dart';
 import '../services/server_discovery.dart';
 import '../services/settings_manager.dart';
-import '../services/api_service.dart';
 import '../utils/validators.dart';
 import '../widgets/common_widgets.dart';
 import '../logo_widget.dart';
@@ -12,14 +11,22 @@ import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   final SettingsManager settingsManager;
+  final AuthService? authService;
+  final ServerDiscovery? serverDiscovery;
 
-  const LoginScreen({super.key, required this.settingsManager});
+  const LoginScreen({
+    super.key,
+    required this.settingsManager,
+    this.authService,
+    this.serverDiscovery,
+  });
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  // Controladores para los campos de texto
   @override
   Widget build(BuildContext context) {
     final isMobile =
@@ -58,7 +65,10 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    _authService = AuthService(settingsManager: widget.settingsManager);
+    // Inyección de dependencias: permite testear y escalar fácilmente
+    _authService =
+        widget.authService ??
+        AuthService(settingsManager: widget.settingsManager);
     _loadSavedUrl();
   }
 
@@ -71,6 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  /// Carga la URL guardada en settings (Single Responsibility)
   Future<void> _loadSavedUrl() async {
     final savedUrl = await widget.settingsManager.getUrl();
     if (mounted && savedUrl != null) {
@@ -78,14 +89,14 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  /// Maneja el proceso de login, separando validación, descubrimiento y autenticación
   Future<void> _handleLogin() async {
-    // Validaciones
+    // 1. Validar campos (Single Responsibility)
     final error = Validators.validateLoginFields(
       url: _urlCtrl.text,
       user: _userCtrl.text,
       password: _passCtrl.text,
     );
-
     if (error != null) {
       if (mounted) {
         CommonWidgets.showErrorDialog(context: context, message: error);
@@ -96,10 +107,11 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // Forzar siempre la URL base a https://uxia3.ieti.site
+      // 2. Forzar siempre la URL base a https://uxia3.ieti.site
       const url = 'https://uxia3.ieti.site';
       await widget.settingsManager.saveUrl(url);
-      // Descubrir servidor (probar diferentes puertos)
+
+      // 3. Descubrir servidor (Open/Closed: puedes cambiar ServerDiscovery)
       final discoveredUrl = await ServerDiscovery.discoverServer(url);
       if (discoveredUrl == null) {
         if (mounted) {
@@ -113,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
       }
       await widget.settingsManager.saveUrl(discoveredUrl);
 
-      // Permitir login con nickname o email
+      // 4. Permitir login con nickname o email
       var email = _userCtrl.text;
       if (!_userCtrl.text.contains('@')) {
         final foundEmail = await _authService.getEmailFromUsername(
@@ -126,7 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
         // Si no se encuentra, intentar login igualmente con el valor introducido
       }
 
-      // Login
+      // 5. Login (Single Responsibility: AuthService solo autentica)
       final result = await _authService.loginAdmin(
         urlBase: discoveredUrl,
         email: email,
@@ -144,7 +156,7 @@ class _LoginScreenState extends State<LoginScreen> {
         return;
       }
 
-
+      // 6. Navegar a HomeScreen si login exitoso
       if (mounted) {
         Navigator.of(context).pop(); // Cerrar diálogo
         Navigator.of(context).pushReplacement(
@@ -170,6 +182,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  /// Muestra el diálogo de login. Solo UI, sin lógica de negocio.
   void _showLoginDialog() {
     showDialog(
       context: context,
@@ -195,7 +208,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _userCtrl,
                   enabled: !_isLoading,
                   decoration: const InputDecoration(
-                    labelText: 'Nom d\'usuari o email',
+                    labelText: "Nom d'usuari o email",
                     prefixIcon: Icon(Icons.person),
                     border: OutlineInputBorder(),
                   ),
