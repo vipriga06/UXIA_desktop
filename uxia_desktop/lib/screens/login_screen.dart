@@ -25,12 +25,36 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
+
 class _LoginScreenState extends State<LoginScreen> {
-  // Controladores para los campos de texto
+  // Controllers
+  final _urlCtrl = TextEditingController();
+  final _userCtrl = TextEditingController();
+  final _passCtrl = TextEditingController();
+
+  bool _showPassword = false;
+  bool _isLoading = false;
+  late final AuthService _authService;
+
+  @override
+  void initState() {
+    super.initState();
+    _authService = widget.authService ?? AuthService(settingsManager: widget.settingsManager);
+    _loadSavedUrl();
+  }
+
+  @override
+  void dispose() {
+    _urlCtrl.dispose();
+    _userCtrl.dispose();
+    _passCtrl.dispose();
+    _authService.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final isMobile =
-        MediaQuery.of(context).size.width < AppConstants.mobileBreakpoint;
+    final isMobile = MediaQuery.of(context).size.width < AppConstants.mobileBreakpoint;
     return Scaffold(
       body: Center(
         child: Column(
@@ -55,13 +79,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  final _urlCtrl = TextEditingController();
-  final _userCtrl = TextEditingController();
-  final _passCtrl = TextEditingController();
-  bool _showPassword = false;
-  bool _isLoading = false;
-  late final AuthService _authService;
-
   @override
   void initState() {
     super.initState();
@@ -81,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  /// Carga la URL guardada en settings (Single Responsibility)
+
   Future<void> _loadSavedUrl() async {
     final savedUrl = await widget.settingsManager.getUrl();
     if (mounted && savedUrl != null) {
@@ -89,9 +106,8 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  /// Maneja el proceso de login, separando validación, descubrimiento y autenticación
+
   Future<void> _handleLogin() async {
-    // 1. Validar campos (Single Responsibility)
     final error = Validators.validateLoginFields(
       url: _urlCtrl.text,
       user: _userCtrl.text,
@@ -107,11 +123,8 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // 2. Forzar siempre la URL base a https://uxia3.ieti.site
       const url = 'https://uxia3.ieti.site';
       await widget.settingsManager.saveUrl(url);
-
-      // 3. Descubrir servidor (Open/Closed: puedes cambiar ServerDiscovery)
       final discoveredUrl = await ServerDiscovery.discoverServer(url);
       if (discoveredUrl == null) {
         if (mounted) {
@@ -125,7 +138,6 @@ class _LoginScreenState extends State<LoginScreen> {
       }
       await widget.settingsManager.saveUrl(discoveredUrl);
 
-      // 4. Permitir login con nickname o email
       var email = _userCtrl.text;
       if (!_userCtrl.text.contains('@')) {
         final foundEmail = await _authService.getEmailFromUsername(
@@ -135,10 +147,8 @@ class _LoginScreenState extends State<LoginScreen> {
         if (foundEmail != null) {
           email = foundEmail;
         }
-        // Si no se encuentra, intentar login igualmente con el valor introducido
       }
 
-      // 5. Login (Single Responsibility: AuthService solo autentica)
       final result = await _authService.loginAdmin(
         urlBase: discoveredUrl,
         email: email,
@@ -156,9 +166,8 @@ class _LoginScreenState extends State<LoginScreen> {
         return;
       }
 
-      // 6. Navegar a HomeScreen si login exitoso
       if (mounted) {
-        Navigator.of(context).pop(); // Cerrar diálogo
+        Navigator.of(context).pop();
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (_) => HomeScreen(
@@ -182,7 +191,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  /// Muestra el diálogo de login. Solo UI, sin lógica de negocio.
   void _showLoginDialog() {
     showDialog(
       context: context,
