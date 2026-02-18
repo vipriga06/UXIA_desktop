@@ -116,8 +116,9 @@ class ApiService {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
         if (data['status'] == 'OK' && data['data'] is List) {
-          return (data['data'] as List)
+            return (data['data'] as List)
               .map((u) => User.fromJson(u as Map<String, dynamic>))
+              .where((user) => user.id.isNotEmpty)
               .toList();
         }
       }
@@ -149,7 +150,12 @@ class ApiService {
       if (response.statusCode == 201) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
         if (data['status'] == 'OK' && data['data'] != null) {
-          return User.fromJson(data['data'] as Map<String, dynamic>);
+          final user = User.fromJson(data['data'] as Map<String, dynamic>);
+          if (user.id.isEmpty) {
+            if (kDebugMode) debugPrint('Error: el backend devolvió id vacío al crear usuario.');
+            throw Exception('Error: el backend devolvió id vacío al crear usuario.');
+          }
+          return user;
         }
       }
       return null;
@@ -160,10 +166,23 @@ class ApiService {
   }
 
   /// Elimina un usuario
-  Future<bool> deleteUser(int userId) async {
+  Future<bool> deleteUser(String userId) async {
     try {
       final response = await delete('${AppConstants.apiPath}${AppConstants.adminPath}/$userId');
-      return response.statusCode == 200;
+      if (kDebugMode) {
+        debugPrint('DELETE user $userId response: ${response.statusCode} ${response.body}');
+      }
+      if (response.statusCode == 200) {
+        // Comprobar que el usuario realmente no está en la lista tras borrar
+        final usersResponse = await getUsers();
+        final exists = usersResponse.any((u) => u.id == userId);
+        if (exists) {
+          if (kDebugMode) debugPrint('Usuario $userId sigue existiendo tras borrar.');
+          return false;
+        }
+        return true;
+      }
+      return false;
     } catch (e) {
       if (kDebugMode) debugPrint('Error deleting user: $e');
       rethrow;
@@ -171,7 +190,7 @@ class ApiService {
   }
 
   /// Actualiza el rol de un usuario
-  Future<User?> updateUserRole(int userId, String newRole) async {
+  Future<User?> updateUserRole(String userId, String newRole) async {
     try {
       final response = await patch(
         '${AppConstants.apiPath}${AppConstants.adminPath}/$userId/rol',

@@ -327,15 +327,21 @@ class _UsersScreenState extends State<_UsersScreen> {
     if (!confirm) return;
 
     try {
-      await _apiService.deleteUser(user.id);
+      final deleted = await _apiService.deleteUser(user.id);
       await _loadData();
-      
       if (mounted) {
-        CommonWidgets.showSnackbar(
-          context: context,
-          message: 'Usuari eliminat correctament',
-          isError: false,
-        );
+        if (deleted) {
+          CommonWidgets.showSnackbar(
+            context: context,
+            message: 'Usuari eliminat correctament',
+            isError: false,
+          );
+        } else {
+          CommonWidgets.showErrorDialog(
+            context: context,
+            message: 'No s’ha pogut eliminar el usuari. Potser segueix existint.',
+          );
+        }
       }
     } catch (e) {
       if (mounted) {

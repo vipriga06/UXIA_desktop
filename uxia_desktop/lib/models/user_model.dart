@@ -1,6 +1,6 @@
 /// Modelo de usuario
 class User {
-  final int id;
+  final String id;
   final String email;
   final String nickname;
   final String? telefon;
@@ -24,13 +24,8 @@ class User {
 
   /// Convierte JSON a User
   factory User.fromJson(Map<String, dynamic> json) {
-    int parseId(dynamic value) {
-      if (value is int) return value;
-      if (value is String) return int.tryParse(value) ?? 0;
-      return 0;
-    }
     return User(
-      id: parseId(json['id']),
+      id: json['id']?.toString() ?? '',
       email: json['email'] as String? ?? '',
       nickname: json['nickname'] as String? ?? '',
       telefon: json['telefon'] as String?,
@@ -61,7 +56,7 @@ class User {
 
   /// Copia con cambios
   User copyWith({
-    int? id,
+    String? id,
     String? email,
     String? nickname,
     String? telefon,

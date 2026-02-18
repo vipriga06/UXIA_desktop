@@ -31,6 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _urlCtrl = TextEditingController();
   final _userCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
+  String? _savedUrl;
 
   bool _showPassword = false;
   bool _isLoading = false;
@@ -84,15 +85,21 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _loadSavedUrl() async {
     final savedUrl = await widget.settingsManager.getUrl();
-    if (mounted && savedUrl != null) {
+    if (mounted && savedUrl != null && savedUrl.isNotEmpty) {
+      _savedUrl = savedUrl;
       _urlCtrl.text = savedUrl;
+    }
+    final savedUser = await widget.settingsManager.getUser();
+    if (mounted && savedUser != null && savedUser.isNotEmpty) {
+      _userCtrl.text = savedUser;
     }
   }
 
 
   Future<void> _handleLogin() async {
+    final urlToUse = _savedUrl ?? _urlCtrl.text;
     final error = Validators.validateLoginFields(
-      url: _urlCtrl.text,
+      url: urlToUse,
       user: _userCtrl.text,
       password: _passCtrl.text,
     );
@@ -106,20 +113,29 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      const url = 'https://uxia3.ieti.site';
-      await widget.settingsManager.saveUrl(url);
-      final discoveredUrl = await ServerDiscovery.discoverServer(url);
-      if (discoveredUrl == null) {
-        if (mounted) {
-          CommonWidgets.showErrorDialog(
-            context: context,
-            message: '${AppConstants.msgServerError} $url',
-          );
+      // Guardar usuario introducido
+      await widget.settingsManager.saveUser(_userCtrl.text);
+
+      String discoveredUrl;
+      if (_savedUrl != null && _savedUrl!.isNotEmpty) {
+        discoveredUrl = _savedUrl!;
+      } else {
+        final inputUrl = _urlCtrl.text.trim();
+        final foundUrl = await ServerDiscovery.discoverServer(inputUrl);
+        if (foundUrl == null) {
+          if (mounted) {
+            CommonWidgets.showErrorDialog(
+              context: context,
+              message: '${AppConstants.msgServerError} $inputUrl',
+            );
+          }
+          setState(() => _isLoading = false);
+          return;
         }
-        setState(() => _isLoading = false);
-        return;
+        discoveredUrl = foundUrl;
+        await widget.settingsManager.saveUrl(discoveredUrl);
+        _savedUrl = discoveredUrl;
       }
-      await widget.settingsManager.saveUrl(discoveredUrl);
 
       var email = _userCtrl.text;
       if (!_userCtrl.text.contains('@')) {
@@ -185,16 +201,45 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                TextField(
-                  controller: _urlCtrl,
-                  enabled: !_isLoading,
-                  decoration: const InputDecoration(
-                    labelText: 'URL del servidor',
-                    prefixIcon: Icon(Icons.cloud),
-                    border: OutlineInputBorder(),
+                if (_savedUrl == null)
+                  TextField(
+                    controller: _urlCtrl,
+                    enabled: !_isLoading,
+                    decoration: const InputDecoration(
+                      labelText: 'URL del servidor',
+                      prefixIcon: Icon(Icons.cloud),
+                      border: OutlineInputBorder(),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 16),
+                if (_savedUrl != null)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.cloud, color: Colors.grey),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            _savedUrl!,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.edit, color: Colors.blue),
+                          tooltip: 'Cambiar URL',
+                          onPressed: _isLoading
+                              ? null
+                              : () async {
+                                  await widget.settingsManager.saveUrl('');
+                                  setStateDialog(() {
+                                    _savedUrl = null;
+                                    _urlCtrl.text = '';
+                                  });
+                                },
+                        ),
+                      ],
+                    ),
+                  ),
                 TextField(
                   controller: _userCtrl,
                   enabled: !_isLoading,
