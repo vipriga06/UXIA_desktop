@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import '../constants/app_constants.dart';
 
 /// Servicio de descubrimiento de servidor
 class ServerDiscovery {

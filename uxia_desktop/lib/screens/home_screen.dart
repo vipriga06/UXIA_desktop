@@ -6,6 +6,7 @@ import '../services/auth_service.dart';
 import '../services/settings_manager.dart';
 import '../widgets/common_widgets.dart';
 import 'login_screen.dart';
+import 'tag_stats_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final SettingsManager settingsManager;
@@ -157,6 +158,22 @@ TOS: ${_currentUser!.tos ? 'Si' : 'No'}
                   onPressed: _showTokenInfo,
                   icon: const Icon(Icons.check_circle),
                   label: const Text('Informació Token'),
+                ),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: buttonWidth,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => TagStatsScreen(apiService: _apiService),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.bar_chart),
+                  label: const Text('Estadístiques d\'etiquetes'),
                 ),
               ),
               const SizedBox(height: 16),
