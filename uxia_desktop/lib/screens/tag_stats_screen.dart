@@ -165,16 +165,30 @@ class _TagStatsScreenState extends State<TagStatsScreen> {
                                       setState(() { showOtherExpanded = expanded; });
                                     },
                                     children: [
-                                      ...otherTags.map((ot) => ListTile(
-                                            dense: true,
-                                            title: Text(
-                                              ot.tag,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(fontSize: 13),
-                                            ),
-                                            leading: const SizedBox(width: 32),
-                                            trailing: Text(ot.count.toString(), style: const TextStyle(fontSize: 12)),
-                                          ))
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 8.0),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            ...otherTags.map((ot) => Column(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    ListTile(
+                                                      dense: true,
+                                                      title: Text(
+                                                        ot.tag,
+                                                        overflow: TextOverflow.ellipsis,
+                                                        style: const TextStyle(fontSize: 13),
+                                                      ),
+                                                      leading: const SizedBox(width: 32),
+                                                      trailing: Text(ot.count.toString(), style: const TextStyle(fontSize: 12)),
+                                                    ),
+                                                    const Divider(height: 1, color: Colors.grey),
+                                                  ],
+                                                )),
+                                          ],
+                                        ),
+                                      ),
                                     ],
                                     // onTap y selected solo en ListTile, no ExpansionTile
                                   );
