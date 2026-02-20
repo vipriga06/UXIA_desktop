@@ -183,7 +183,7 @@ class _TagStatsScreenState extends State<TagStatsScreen> {
                                                       leading: const SizedBox(width: 32),
                                                       trailing: Text(ot.count.toString(), style: const TextStyle(fontSize: 12)),
                                                     ),
-                                                    const Divider(height: 1, color: Colors.grey),
+                                                    // Divider eliminado
                                                   ],
                                                 )),
                                           ],
