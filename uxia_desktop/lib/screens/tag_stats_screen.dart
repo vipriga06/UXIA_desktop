@@ -95,8 +95,8 @@ class _TagStatsScreenState extends State<TagStatsScreen> {
       }
       return t.tag.toLowerCase().contains(lowerQuery);
     }).toList();
-    // Solo mostrar en la gráfica los tags seleccionados
-    final filteredTags = groupedTags.where((t) => selectedTags.contains(t.tag)).toList();
+    // Mostrar en la gráfica solo los tags filtrados y seleccionados
+    final filteredTags = filteredGroupedTags.where((t) => selectedTags.contains(t.tag)).toList();
     return LayoutBuilder(
       builder: (context, constraints) {
         return Scaffold(
