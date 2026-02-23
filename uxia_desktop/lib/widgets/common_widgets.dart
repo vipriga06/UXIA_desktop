@@ -74,7 +74,9 @@ class CommonWidgets {
         prefixIcon: Icon(icon),
         suffixIcon: onToggleObscure != null
             ? IconButton(
-                icon: Icon(obscureText ? Icons.visibility_off : Icons.visibility),
+                icon: Icon(
+                  obscureText ? Icons.visibility_off : Icons.visibility,
+                ),
                 onPressed: onToggleObscure,
               )
             : null,

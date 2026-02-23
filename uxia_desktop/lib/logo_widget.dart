@@ -12,7 +12,9 @@ class WidgetLogo extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: const Color(0xFF8bc6cc), // color secundario (igual que primaryColorValue)
+        color: const Color(
+          0xFF8bc6cc,
+        ), // color secundario (igual que primaryColorValue)
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(

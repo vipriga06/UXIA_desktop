@@ -32,10 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _apiService = ApiService(
-      baseUrl: widget.urlServidor,
-      token: widget.token,
-    );
+    _apiService = ApiService(baseUrl: widget.urlServidor, token: widget.token);
     _authService = AuthService(settingsManager: widget.settingsManager);
     _loadCurrentUser();
   }
@@ -71,7 +68,8 @@ class _HomeScreenState extends State<HomeScreen> {
       if (mounted) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (_) => LoginScreen(settingsManager: widget.settingsManager),
+            builder: (_) =>
+                LoginScreen(settingsManager: widget.settingsManager),
           ),
         );
       }
@@ -94,7 +92,8 @@ class _HomeScreenState extends State<HomeScreen> {
       return;
     }
 
-    final info = '''
+    final info =
+        '''
 ID: ${_currentUser!.userId}
 Usuari: ${_currentUser!.nickname}
 Email: ${_currentUser!.email}
@@ -115,7 +114,8 @@ TOS: ${_currentUser!.tos ? 'Si' : 'No'}
 
   @override
   Widget build(BuildContext context) {
-    final isMobile = MediaQuery.of(context).size.width < AppConstants.mobileBreakpoint;
+    final isMobile =
+        MediaQuery.of(context).size.width < AppConstants.mobileBreakpoint;
     final buttonWidth = isMobile ? double.infinity : 300.0;
 
     return Scaffold(
@@ -217,10 +217,7 @@ class _UsersScreenState extends State<_UsersScreen> {
   @override
   void initState() {
     super.initState();
-    _apiService = ApiService(
-      baseUrl: widget.urlServidor,
-      token: widget.token,
-    );
+    _apiService = ApiService(baseUrl: widget.urlServidor, token: widget.token);
     _loadData();
   }
 
@@ -233,10 +230,10 @@ class _UsersScreenState extends State<_UsersScreen> {
   Future<void> _loadData() async {
     try {
       setState(() => _isLoading = true);
-      
+
       final user = await _apiService.getAuthUser();
       final users = await _apiService.getUsers();
-      
+
       if (mounted) {
         setState(() {
           _currentUserId = user?.userId;
@@ -308,24 +305,31 @@ class _UsersScreenState extends State<_UsersScreen> {
     if (result != true) return;
 
     try {
-      await _apiService.createUser(
+      final user = await _apiService.createUser(
         email: emailCtrl.text,
         nickname: nicknameCtrl.text,
         password: passwordCtrl.text,
         telefon: phoneCtrl.text,
       );
       await _loadData();
-      
+
       if (mounted) {
-        CommonWidgets.showSnackbar(
-          context: context,
-          message: 'Usuari creat correctament',
-          isError: false,
-        );
+        if (user != null) {
+          await CommonWidgets.showInfoDialog(
+            context: context,
+            title: 'Usuari creat',
+            message: 'Usuari creat correctament. Rebràs un SMS amb el codi de validació. El nou usuari no apareixerà a la llista fins que es valide.',
+          );
+        } else {
+          await CommonWidgets.showErrorDialog(
+            context: context,
+            message: 'El servidor no ha creat el usuari. Revisa los datos o consulta los logs del backend.',
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
-        CommonWidgets.showErrorDialog(
+        await CommonWidgets.showErrorDialog(
           context: context,
           message: 'Error creant usuari: $e',
         );
@@ -356,7 +360,8 @@ class _UsersScreenState extends State<_UsersScreen> {
         } else {
           CommonWidgets.showErrorDialog(
             context: context,
-            message: 'No s’ha pogut eliminar el usuari. Potser segueix existint.',
+            message:
+                'No s’ha pogut eliminar el usuari. Potser segueix existint.',
           );
         }
       }
@@ -413,7 +418,7 @@ class _UsersScreenState extends State<_UsersScreen> {
     try {
       await _apiService.updateUserRole(user.id, newRole);
       await _loadData();
-      
+
       if (mounted) {
         CommonWidgets.showSnackbar(
           context: context,

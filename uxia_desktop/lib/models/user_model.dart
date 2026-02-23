@@ -32,12 +32,12 @@ class User {
       role: json['role'] as String? ?? 'user',
       validat: json['validat'] as bool? ?? false,
       tos: json['tos'] as bool? ?? false,
-      createdAt: json['createdAt'] != null 
-        ? DateTime.tryParse(json['createdAt'] as String) 
-        : null,
-      updatedAt: json['updatedAt'] != null 
-        ? DateTime.tryParse(json['updatedAt'] as String) 
-        : null,
+      createdAt: json['createdAt'] != null
+          ? DateTime.tryParse(json['createdAt'] as String)
+          : null,
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.tryParse(json['updatedAt'] as String)
+          : null,
     );
   }
 
@@ -88,10 +88,7 @@ class LoginResponse {
   final String token;
   final String message;
 
-  LoginResponse({
-    required this.token,
-    required this.message,
-  });
+  LoginResponse({required this.token, required this.message});
 
   factory LoginResponse.fromJson(Map<String, dynamic> json) {
     return LoginResponse(
@@ -127,6 +124,7 @@ class AuthUser {
       if (value is String) return int.tryParse(value) ?? 0;
       return 0;
     }
+
     return AuthUser(
       userId: parseUserId(json['userId']),
       nickname: json['nickname'] as String? ?? '',

@@ -1,18 +1,16 @@
-
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsManager {
-    Future<String?> getUser() async {
-      final prefs = await SharedPreferences.getInstance();
-      return prefs.getString(_userKey);
-    }
+  Future<String?> getUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_userKey);
+  }
+
   static const String _urlKey = 'uxia_url';
   static const String _tokenKey = 'uxia_token';
   static const String _userKey = 'saved_user';
 
-  Future<void> initialize() async {
-  }
+  Future<void> initialize() async {}
 
   Future<void> saveUrl(String url) async {
     final prefs = await SharedPreferences.getInstance();
@@ -41,6 +39,5 @@ class SettingsManager {
 
   Future<void> saveUser(String user) async {
     final prefs = await SharedPreferences.getInstance();
-
   }
 }

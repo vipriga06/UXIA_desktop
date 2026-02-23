@@ -28,7 +28,10 @@ class _TagStatsScreenState extends State<TagStatsScreen> {
   }
 
   Future<void> fetchTags() async {
-    setState(() { loading = true; error = null; });
+    setState(() {
+      loading = true;
+      error = null;
+    });
     try {
       final response = await widget.apiService.get('/api/tags/stats');
       final json = response.body.isNotEmpty ? response.body : '{}';
@@ -39,7 +42,9 @@ class _TagStatsScreenState extends State<TagStatsScreen> {
           tags = (d['tags'] as List).map((e) => TagStat.fromJson(e)).toList();
           // Agrupar tags menores al 20% del mayor en 'Altres'
           if (tags.isNotEmpty) {
-            final maxCount = tags.map((e) => e.count).reduce((a, b) => a > b ? a : b);
+            final maxCount = tags
+                .map((e) => e.count)
+                .reduce((a, b) => a > b ? a : b);
             final threshold = (maxCount * 0.2).ceil();
             final mainTags = <TagStat>[];
             final others = <TagStat>[];
@@ -70,7 +75,9 @@ class _TagStatsScreenState extends State<TagStatsScreen> {
     } catch (e) {
       error = e.toString();
     }
-    setState(() { loading = false; });
+    setState(() {
+      loading = false;
+    });
   }
 
   void toggleTag(String tag) {
@@ -87,7 +94,9 @@ class _TagStatsScreenState extends State<TagStatsScreen> {
   Widget build(BuildContext context) {
     // Filtrado de tags por búsqueda
     final lowerQuery = searchQuery.trim().toLowerCase();
-    final filteredOtherTags = otherTags.where((t) => t.tag.toLowerCase().contains(lowerQuery)).toList();
+    final filteredOtherTags = otherTags
+        .where((t) => t.tag.toLowerCase().contains(lowerQuery))
+        .toList();
     final filteredGroupedTags = groupedTags.where((t) {
       if (t.tag == 'Altres') {
         // Solo mostrar 'Altres' si hay algún tag en filteredOtherTags
@@ -96,7 +105,9 @@ class _TagStatsScreenState extends State<TagStatsScreen> {
       return t.tag.toLowerCase().contains(lowerQuery);
     }).toList();
     // Mostrar en la gráfica solo los tags filtrados y seleccionados
-    final filteredTags = filteredGroupedTags.where((t) => selectedTags.contains(t.tag)).toList();
+    final filteredTags = filteredGroupedTags
+        .where((t) => selectedTags.contains(t.tag))
+        .toList();
     return LayoutBuilder(
       builder: (context, constraints) {
         return Scaffold(
@@ -104,144 +115,200 @@ class _TagStatsScreenState extends State<TagStatsScreen> {
           body: loading
               ? const Center(child: CircularProgressIndicator())
               : error != null
-                  ? Center(child: Text(error!))
-                  : Row(
-                      children: [
-                        // Barra lateral
-                        Container(
-                          width: 200,
-                          color: Colors.grey[100],
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                                child: TextField(
-                                  decoration: InputDecoration(
-                                    hintText: 'Buscar etiqueta...',
-                                    prefixIcon: const Icon(Icons.search, size: 20),
-                                    isDense: true,
-                                    contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                  ),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      searchQuery = value;
-                                    });
-                                  },
+              ? Center(child: Text(error!))
+              : Row(
+                  children: [
+                    // Barra lateral
+                    Container(
+                      width: 200,
+                      color: Colors.grey[100],
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 10,
+                            ),
+                            child: TextField(
+                              decoration: InputDecoration(
+                                hintText: 'Buscar etiqueta...',
+                                prefixIcon: const Icon(Icons.search, size: 20),
+                                isDense: true,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 8,
+                                  horizontal: 8,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
                               ),
-                              Expanded(
-                                child: ListView(
-                                  children: [
-                                    ...filteredGroupedTags.map((tag) {
-                                      final color = tag.tag == 'Altres' ? Colors.grey : tagColor(tag.tag);
-                                      final selected = selectedTags.contains(tag.tag);
-                                      if (tag.tag != 'Altres') {
-                                        return ListTile(
-                                          title: Row(
-                                            children: [
-                                              Flexible(
-                                                fit: FlexFit.loose,
-                                                child: Text(
-                                                  tag.tag,
-                                                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-                                                  maxLines: 1,
-                                                  softWrap: false,
-                                                  overflow: TextOverflow.visible,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          leading: CircleAvatar(backgroundColor: color),
-                                          trailing: selected
-                                              ? const Icon(Icons.check, color: Colors.green)
-                                              : null,
-                                          selected: selected,
-                                          onTap: () => toggleTag(tag.tag),
-                                        );
-                                      } else {
-                                        return ExpansionTile(
-                                          title: Row(
-                                            children: [
-                                              Flexible(
-                                                fit: FlexFit.loose,
-                                                child: Text(
-                                                  'Altres',
-                                                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-                                                  maxLines: 1,
-                                                  softWrap: false,
-                                                  overflow: TextOverflow.visible,
-                                                ),
-                                              ),
-                                              const SizedBox(width: 8),
-                                              Container(
-                                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.grey[300],
-                                                  borderRadius: BorderRadius.circular(8),
-                                                ),
-                                                child: Text(
-                                                  filteredOtherTags.length.toString(),
-                                                  style: const TextStyle(fontSize: 12, color: Colors.black54),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          leading: CircleAvatar(backgroundColor: Colors.grey),
-                                          trailing: selected
-                                              ? const Icon(Icons.check, color: Colors.green)
-                                              : null,
-                                          initiallyExpanded: showOtherExpanded,
-                                          onExpansionChanged: (expanded) {
-                                            setState(() { showOtherExpanded = expanded; });
-                                          },
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.only(top: 8.0),
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  ...filteredOtherTags.map((ot) => Column(
-                                                        mainAxisSize: MainAxisSize.min,
-                                                        children: [
-                                                          ListTile(
-                                                            dense: true,
-                                                            title: Text(
-                                                              ot.tag,
-                                                              overflow: TextOverflow.ellipsis,
-                                                              style: const TextStyle(fontSize: 13),
-                                                            ),
-                                                            leading: const SizedBox(width: 32),
-                                                            trailing: Text(ot.count.toString(), style: const TextStyle(fontSize: 12)),
-                                                          ),
-                                                        ],
-                                                      )),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        );
-                                      }
-                                    }),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        // Gràfica de barres
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.all(24.0),
-                            child: TagBarChart(
-                              tags: filteredTags,
-                              selectedTags: selectedTags,
-                              availableWidth: constraints.maxWidth - 200 - 48, // 200 sidebar + 2*24 padding
+                              onChanged: (value) {
+                                setState(() {
+                                  searchQuery = value;
+                                });
+                              },
                             ),
                           ),
-                        ),
-                      ],
+                          Expanded(
+                            child: ListView(
+                              children: [
+                                ...filteredGroupedTags.map((tag) {
+                                  final color = tag.tag == 'Altres'
+                                      ? Colors.grey
+                                      : tagColor(tag.tag);
+                                  final selected = selectedTags.contains(
+                                    tag.tag,
+                                  );
+                                  if (tag.tag != 'Altres') {
+                                    return ListTile(
+                                      title: Row(
+                                        children: [
+                                          Flexible(
+                                            fit: FlexFit.loose,
+                                            child: Text(
+                                              tag.tag,
+                                              style: const TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                              maxLines: 1,
+                                              softWrap: false,
+                                              overflow: TextOverflow.visible,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      leading: CircleAvatar(
+                                        backgroundColor: color,
+                                      ),
+                                      trailing: selected
+                                          ? const Icon(
+                                              Icons.check,
+                                              color: Colors.green,
+                                            )
+                                          : null,
+                                      selected: selected,
+                                      onTap: () => toggleTag(tag.tag),
+                                    );
+                                  } else {
+                                    return ExpansionTile(
+                                      title: Row(
+                                        children: [
+                                          Flexible(
+                                            fit: FlexFit.loose,
+                                            child: Text(
+                                              'Altres',
+                                              style: const TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                              maxLines: 1,
+                                              softWrap: false,
+                                              overflow: TextOverflow.visible,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 6,
+                                              vertical: 2,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey[300],
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child: Text(
+                                              filteredOtherTags.length
+                                                  .toString(),
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.black54,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      leading: CircleAvatar(
+                                        backgroundColor: Colors.grey,
+                                      ),
+                                      trailing: selected
+                                          ? const Icon(
+                                              Icons.check,
+                                              color: Colors.green,
+                                            )
+                                          : null,
+                                      initiallyExpanded: showOtherExpanded,
+                                      onExpansionChanged: (expanded) {
+                                        setState(() {
+                                          showOtherExpanded = expanded;
+                                        });
+                                      },
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            top: 8.0,
+                                          ),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              ...filteredOtherTags.map(
+                                                (ot) => Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    ListTile(
+                                                      dense: true,
+                                                      title: Text(
+                                                        ot.tag,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        style: const TextStyle(
+                                                          fontSize: 13,
+                                                        ),
+                                                      ),
+                                                      leading: const SizedBox(
+                                                        width: 32,
+                                                      ),
+                                                      trailing: Text(
+                                                        ot.count.toString(),
+                                                        style: const TextStyle(
+                                                          fontSize: 12,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  }
+                                }),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
+                    // Gràfica de barres
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: TagBarChart(
+                          tags: filteredTags,
+                          selectedTags: selectedTags,
+                          availableWidth:
+                              constraints.maxWidth -
+                              200 -
+                              48, // 200 sidebar + 2*24 padding
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
         );
       },
     );
@@ -250,8 +317,16 @@ class _TagStatsScreenState extends State<TagStatsScreen> {
   // Assigna un color únic per etiqueta
   Color tagColor(String tag) {
     final colors = [
-      Colors.blue, Colors.red, Colors.green, Colors.orange, Colors.purple,
-      Colors.teal, Colors.amber, Colors.pink, Colors.cyan, Colors.indigo
+      Colors.blue,
+      Colors.red,
+      Colors.green,
+      Colors.orange,
+      Colors.purple,
+      Colors.teal,
+      Colors.amber,
+      Colors.pink,
+      Colors.cyan,
+      Colors.indigo,
     ];
     final idx = tag.hashCode.abs() % colors.length;
     return colors[idx];
@@ -270,7 +345,12 @@ class TagBarChart extends StatelessWidget {
   final List<TagStat> tags;
   final Set<String> selectedTags;
   final double availableWidth;
-  const TagBarChart({required this.tags, required this.selectedTags, required this.availableWidth, Key? key}) : super(key: key);
+  const TagBarChart({
+    required this.tags,
+    required this.selectedTags,
+    required this.availableWidth,
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -287,7 +367,8 @@ class TagBarChart extends StatelessWidget {
     double rightPad = 40;
     double totalWidth = n * barWidth + (n - 1) * spacing;
     if (totalWidth + leftPad + rightPad > availableWidth) {
-      spacing = ((availableWidth - leftPad - rightPad) - n * barWidth) / (n - 1);
+      spacing =
+          ((availableWidth - leftPad - rightPad) - n * barWidth) / (n - 1);
       if (spacing < 2) spacing = 2;
       totalWidth = n * barWidth + (n - 1) * spacing;
     }
@@ -299,7 +380,14 @@ class TagBarChart extends StatelessWidget {
     }
     return CustomPaint(
       size: Size(availableWidth, 400),
-      painter: TagBarChartPainter(tags, selectedTags, barWidth: barWidth, spacing: spacing, leftPad: leftPad, rightPad: rightPad),
+      painter: TagBarChartPainter(
+        tags,
+        selectedTags,
+        barWidth: barWidth,
+        spacing: spacing,
+        leftPad: leftPad,
+        rightPad: rightPad,
+      ),
     );
   }
 }
@@ -311,7 +399,14 @@ class TagBarChartPainter extends CustomPainter {
   final double spacing;
   final double leftPad;
   final double rightPad;
-  TagBarChartPainter(this.tags, this.selectedTags, {required this.barWidth, required this.spacing, required this.leftPad, required this.rightPad});
+  TagBarChartPainter(
+    this.tags,
+    this.selectedTags, {
+    required this.barWidth,
+    required this.spacing,
+    required this.leftPad,
+    required this.rightPad,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -336,7 +431,11 @@ class TagBarChartPainter extends CustomPainter {
       // Dibuixa el text de la etiqueta (rotado para evitar solapamiento)
       textPainter.text = TextSpan(
         text: tag.tag,
-        style: const TextStyle(fontSize: 12, color: Colors.black, fontWeight: FontWeight.w500),
+        style: const TextStyle(
+          fontSize: 12,
+          color: Colors.black,
+          fontWeight: FontWeight.w500,
+        ),
       );
       textPainter.layout(minWidth: 0, maxWidth: 80);
       // Rotar -45 grados y pintar debajo de la barra
@@ -345,9 +444,13 @@ class TagBarChartPainter extends CustomPainter {
       const labelOffset = 8.0;
       // Ajuste de centrado para compensar la rotación y el ancho del texto
       final centerCorrectionY = textPainter.height / 2.2;
-      final centerCorrectionX = (textPainter.width / 2) * (1 - 1 / 1.4142); // 1/sqrt(2)
+      final centerCorrectionX =
+          (textPainter.width / 2) * (1 - 1 / 1.4142); // 1/sqrt(2)
       canvas.save();
-      canvas.translate(labelX - centerCorrectionX, labelY + labelOffset + centerCorrectionY);
+      canvas.translate(
+        labelX - centerCorrectionX,
+        labelY + labelOffset + centerCorrectionY,
+      );
       canvas.rotate(-0.785398); // -45 grados en radianes
       textPainter.paint(canvas, Offset(-textPainter.width / 2, 0));
       canvas.restore();
@@ -363,18 +466,38 @@ class TagBarChartPainter extends CustomPainter {
         style: const TextStyle(fontSize: 12, color: Colors.black),
       );
       textPainter.layout(minWidth: 0, maxWidth: barWidth + 10);
-      textPainter.paint(canvas, Offset(x + (barWidth - textPainter.width) / 2, y - 18));
+      textPainter.paint(
+        canvas,
+        Offset(x + (barWidth - textPainter.width) / 2, y - 18),
+      );
     }
   }
 
   Color _tagColor(String tag, int index) {
     // Paleta extendida para evitar repeticiones
     const colors = [
-      Colors.blue, Colors.red, Colors.green, Colors.orange, Colors.purple,
-      Colors.teal, Colors.amber, Colors.pink, Colors.cyan, Colors.indigo,
-      Colors.lime, Colors.deepOrange, Colors.deepPurple, Colors.lightBlue,
-      Colors.lightGreen, Colors.brown, Colors.blueGrey, Colors.yellow,
-      Colors.grey, Colors.lightGreenAccent, Colors.indigoAccent, Colors.purpleAccent
+      Colors.blue,
+      Colors.red,
+      Colors.green,
+      Colors.orange,
+      Colors.purple,
+      Colors.teal,
+      Colors.amber,
+      Colors.pink,
+      Colors.cyan,
+      Colors.indigo,
+      Colors.lime,
+      Colors.deepOrange,
+      Colors.deepPurple,
+      Colors.lightBlue,
+      Colors.lightGreen,
+      Colors.brown,
+      Colors.blueGrey,
+      Colors.yellow,
+      Colors.grey,
+      Colors.lightGreenAccent,
+      Colors.indigoAccent,
+      Colors.purpleAccent,
     ];
     // Asignar color por índice para evitar repeticiones visuales
     return colors[index % colors.length];

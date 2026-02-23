@@ -30,7 +30,8 @@ class ServerDiscovery {
         return null;
       }
       if (uri.host.isEmpty) {
-        if (kDebugMode) debugPrint('[Server Discovery] ✗ URL sin host: $cleanUrl');
+        if (kDebugMode)
+          debugPrint('[Server Discovery] ✗ URL sin host: $cleanUrl');
         return null;
       }
       String testUrl = uri.origin;
@@ -47,7 +48,8 @@ class ServerDiscovery {
           .get(Uri.parse('$url$_testEndpoint'))
           .timeout(_timeout);
       final success = response.statusCode >= 200 && response.statusCode < 300;
-      if (success && kDebugMode) debugPrint('[Server Discovery] ✓ Conexión exitosa: $url');
+      if (success && kDebugMode)
+        debugPrint('[Server Discovery] ✓ Conexión exitosa: $url');
       return success;
     } catch (e, st) {
       if (kDebugMode) debugPrint('[Server Discovery] ✗ Error en $url: $e\n$st');

@@ -41,17 +41,17 @@ class Validators {
     if (isEmpty(url) || isEmpty(user) || isEmpty(password)) {
       return AppConstants.msgEmptyFields;
     }
-    
+
     final urlToCheck = addScheme(url);
     if (!isValidUrl(urlToCheck)) {
       if (kDebugMode) debugPrint('URL validation failed: $urlToCheck');
       return AppConstants.msgInvalidUrl;
     }
-    
+
     if (user.contains('@') && !isValidEmail(user)) {
       return AppConstants.msgInvalidEmail;
     }
-    
+
     return null;
   }
 }

@@ -27,7 +27,7 @@ class ApiService {
     try {
       final url = Uri.parse('$baseUrl$endpoint');
       if (kDebugMode) debugPrint('[GET] $url');
-      
+
       return await _httpClient
           .get(url, headers: _defaultHeaders())
           .timeout(const Duration(seconds: AppConstants.timeoutSeconds));
@@ -38,17 +38,16 @@ class ApiService {
   }
 
   /// Realiza una petición POST
-  Future<http.Response> post(String endpoint, {required Map<String, dynamic> body}) async {
+  Future<http.Response> post(
+    String endpoint, {
+    required Map<String, dynamic> body,
+  }) async {
     try {
       final url = Uri.parse('$baseUrl$endpoint');
       if (kDebugMode) debugPrint('[POST] $url with body: $body');
-      
+
       return await _httpClient
-          .post(
-            url,
-            headers: _defaultHeaders(),
-            body: jsonEncode(body),
-          )
+          .post(url, headers: _defaultHeaders(), body: jsonEncode(body))
           .timeout(const Duration(seconds: AppConstants.timeoutSeconds));
     } catch (e) {
       if (kDebugMode) debugPrint('[POST ERROR] $e');
@@ -57,17 +56,16 @@ class ApiService {
   }
 
   /// Realiza una petición PATCH
-  Future<http.Response> patch(String endpoint, {required Map<String, dynamic> body}) async {
+  Future<http.Response> patch(
+    String endpoint, {
+    required Map<String, dynamic> body,
+  }) async {
     try {
       final url = Uri.parse('$baseUrl$endpoint');
       if (kDebugMode) debugPrint('[PATCH] $url with body: $body');
-      
+
       return await _httpClient
-          .patch(
-            url,
-            headers: _defaultHeaders(),
-            body: jsonEncode(body),
-          )
+          .patch(url, headers: _defaultHeaders(), body: jsonEncode(body))
           .timeout(const Duration(seconds: AppConstants.timeoutSeconds));
     } catch (e) {
       if (kDebugMode) debugPrint('[PATCH ERROR] $e');
@@ -80,7 +78,7 @@ class ApiService {
     try {
       final url = Uri.parse('$baseUrl$endpoint');
       if (kDebugMode) debugPrint('[DELETE] $url');
-      
+
       return await _httpClient
           .delete(url, headers: _defaultHeaders())
           .timeout(const Duration(seconds: AppConstants.timeoutSeconds));
@@ -93,8 +91,10 @@ class ApiService {
   /// Obtiene el usuario autenticado
   Future<AuthUser?> getAuthUser() async {
     try {
-      final response = await get('${AppConstants.apiPath}${AppConstants.adminPath}/testtoken');
-      
+      final response = await get(
+        '${AppConstants.apiPath}${AppConstants.adminPath}/testtoken',
+      );
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
         if (data['status'] == 'OK' && data['data'] != null) {
@@ -111,12 +111,14 @@ class ApiService {
   /// Obtiene lista de usuarios
   Future<List<User>> getUsers() async {
     try {
-      final response = await get('${AppConstants.apiPath}${AppConstants.adminPath}');
-      
+      final response = await get(
+        '${AppConstants.apiPath}${AppConstants.adminPath}',
+      );
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
         if (data['status'] == 'OK' && data['data'] is List) {
-            return (data['data'] as List)
+          return (data['data'] as List)
               .map((u) => User.fromJson(u as Map<String, dynamic>))
               .where((user) => user.id.isNotEmpty)
               .toList();
@@ -137,6 +139,8 @@ class ApiService {
     required String telefon,
   }) async {
     try {
+      // Generar una contraseña aleatoria si no se proporciona
+      final password = 'UxIa${DateTime.now().millisecondsSinceEpoch}';
       final response = await post(
         '${AppConstants.apiPath}${AppConstants.adminPath}',
         body: {
@@ -144,18 +148,31 @@ class ApiService {
           'nickname': nickname,
           'password': password,
           'telefon': telefon,
+          'role': 'user',
+          'validat': true,
+          'tos': true,
         },
       );
-      
+
+      if (kDebugMode) {
+        debugPrint('[CREATE USER] status: ${response.statusCode} body: ${response.body}');
+      }
+
       if (response.statusCode == 201) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
         if (data['status'] == 'OK' && data['data'] != null) {
           final user = User.fromJson(data['data'] as Map<String, dynamic>);
           if (user.id.isEmpty) {
-            if (kDebugMode) debugPrint('Error: el backend devolvió id vacío al crear usuario.');
+            if (kDebugMode) {
+              debugPrint('Error: el backend devolvió id vacío al crear usuario.');
+            }
             throw Exception('Error: el backend devolvió id vacío al crear usuario.');
           }
           return user;
+        }
+      } else {
+        if (kDebugMode) {
+          debugPrint('[CREATE USER ERROR] status: ${response.statusCode} body: ${response.body}');
         }
       }
       return null;
@@ -168,16 +185,22 @@ class ApiService {
   /// Elimina un usuario
   Future<bool> deleteUser(String userId) async {
     try {
-      final response = await delete('${AppConstants.apiPath}${AppConstants.adminPath}/$userId');
+      final response = await delete(
+        '${AppConstants.apiPath}${AppConstants.adminPath}/$userId',
+      );
       if (kDebugMode) {
-        debugPrint('DELETE user $userId response: ${response.statusCode} ${response.body}');
+        debugPrint(
+          'DELETE user $userId response: ${response.statusCode} ${response.body}',
+        );
       }
       if (response.statusCode == 200) {
         // Comprobar que el usuario realmente no está en la lista tras borrar
         final usersResponse = await getUsers();
         final exists = usersResponse.any((u) => u.id == userId);
         if (exists) {
-          if (kDebugMode) debugPrint('Usuario $userId sigue existiendo tras borrar.');
+          if (kDebugMode) {
+            debugPrint('Usuario $userId sigue existiendo tras borrar.');
+          }
           return false;
         }
         return true;
@@ -196,7 +219,7 @@ class ApiService {
         '${AppConstants.apiPath}${AppConstants.adminPath}/$userId/rol',
         body: {'role': newRole},
       );
-      
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
         if (data['status'] == 'OK' && data['data'] != null) {

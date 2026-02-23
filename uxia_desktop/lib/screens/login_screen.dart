@@ -25,7 +25,6 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-
 class _LoginScreenState extends State<LoginScreen> {
   // Controllers
   final _urlCtrl = TextEditingController();
@@ -40,14 +39,16 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    _authService = widget.authService ?? AuthService(settingsManager: widget.settingsManager);
+    _authService =
+        widget.authService ??
+        AuthService(settingsManager: widget.settingsManager);
     _loadSavedUrl();
   }
 
-
   @override
   Widget build(BuildContext context) {
-    final isMobile = MediaQuery.of(context).size.width < AppConstants.mobileBreakpoint;
+    final isMobile =
+        MediaQuery.of(context).size.width < AppConstants.mobileBreakpoint;
     return Scaffold(
       body: Center(
         child: Column(
@@ -72,7 +73,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-
   @override
   void dispose() {
     _urlCtrl.dispose();
@@ -81,7 +81,6 @@ class _LoginScreenState extends State<LoginScreen> {
     _authService.dispose();
     super.dispose();
   }
-
 
   Future<void> _loadSavedUrl() async {
     final savedUrl = await widget.settingsManager.getUrl();
@@ -94,7 +93,6 @@ class _LoginScreenState extends State<LoginScreen> {
       _userCtrl.text = savedUser;
     }
   }
-
 
   Future<void> _handleLogin() async {
     final urlToUse = _savedUrl ?? _urlCtrl.text;
