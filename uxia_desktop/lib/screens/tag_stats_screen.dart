@@ -19,6 +19,7 @@ class _TagStatsScreenState extends State<TagStatsScreen> {
   Set<String> selectedTags = {};
   bool loading = true;
   String? error;
+  String searchQuery = '';
 
   @override
   void initState() {
@@ -84,6 +85,16 @@ class _TagStatsScreenState extends State<TagStatsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Filtrado de tags por búsqueda
+    final lowerQuery = searchQuery.trim().toLowerCase();
+    final filteredOtherTags = otherTags.where((t) => t.tag.toLowerCase().contains(lowerQuery)).toList();
+    final filteredGroupedTags = groupedTags.where((t) {
+      if (t.tag == 'Altres') {
+        // Solo mostrar 'Altres' si hay algún tag en filteredOtherTags
+        return filteredOtherTags.isNotEmpty;
+      }
+      return t.tag.toLowerCase().contains(lowerQuery);
+    }).toList();
     // Solo mostrar en la gráfica los tags seleccionados
     final filteredTags = groupedTags.where((t) => selectedTags.contains(t.tag)).toList();
     return LayoutBuilder(
@@ -100,100 +111,121 @@ class _TagStatsScreenState extends State<TagStatsScreen> {
                         Container(
                           width: 200,
                           color: Colors.grey[100],
-                          child: ListView(
+                          child: Column(
                             children: [
-                              ...groupedTags.map((tag) {
-                                final color = tag.tag == 'Altres' ? Colors.grey : tagColor(tag.tag);
-                                final selected = selectedTags.contains(tag.tag);
-                                if (tag.tag != 'Altres') {
-                                  return ListTile(
-                                    title: Row(
-                                      children: [
-                                        Flexible(
-                                          fit: FlexFit.loose,
-                                          child: Text(
-                                            tag.tag,
-                                            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-                                            maxLines: 1,
-                                            softWrap: false,
-                                            overflow: TextOverflow.visible,
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                child: TextField(
+                                  decoration: InputDecoration(
+                                    hintText: 'Buscar etiqueta...',
+                                    prefixIcon: const Icon(Icons.search, size: 20),
+                                    isDense: true,
+                                    contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                  ),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      searchQuery = value;
+                                    });
+                                  },
+                                ),
+                              ),
+                              Expanded(
+                                child: ListView(
+                                  children: [
+                                    ...filteredGroupedTags.map((tag) {
+                                      final color = tag.tag == 'Altres' ? Colors.grey : tagColor(tag.tag);
+                                      final selected = selectedTags.contains(tag.tag);
+                                      if (tag.tag != 'Altres') {
+                                        return ListTile(
+                                          title: Row(
+                                            children: [
+                                              Flexible(
+                                                fit: FlexFit.loose,
+                                                child: Text(
+                                                  tag.tag,
+                                                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                                                  maxLines: 1,
+                                                  softWrap: false,
+                                                  overflow: TextOverflow.visible,
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                    leading: CircleAvatar(backgroundColor: color),
-                                    trailing: selected
-                                        ? const Icon(Icons.check, color: Colors.green)
-                                        : null,
-                                    selected: selected,
-                                    onTap: () => toggleTag(tag.tag),
-                                  );
-                                } else {
-                                  return ExpansionTile(
-                                    title: Row(
-                                      children: [
-                                        Flexible(
-                                          fit: FlexFit.loose,
-                                          child: Text(
-                                            'Altres',
-                                            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-                                            maxLines: 1,
-                                            softWrap: false,
-                                            overflow: TextOverflow.visible,
+                                          leading: CircleAvatar(backgroundColor: color),
+                                          trailing: selected
+                                              ? const Icon(Icons.check, color: Colors.green)
+                                              : null,
+                                          selected: selected,
+                                          onTap: () => toggleTag(tag.tag),
+                                        );
+                                      } else {
+                                        return ExpansionTile(
+                                          title: Row(
+                                            children: [
+                                              Flexible(
+                                                fit: FlexFit.loose,
+                                                child: Text(
+                                                  'Altres',
+                                                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                                                  maxLines: 1,
+                                                  softWrap: false,
+                                                  overflow: TextOverflow.visible,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Container(
+                                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.grey[300],
+                                                  borderRadius: BorderRadius.circular(8),
+                                                ),
+                                                child: Text(
+                                                  filteredOtherTags.length.toString(),
+                                                  style: const TextStyle(fontSize: 12, color: Colors.black54),
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey[300],
-                                            borderRadius: BorderRadius.circular(8),
-                                          ),
-                                          child: Text(
-                                            otherTags.length.toString(),
-                                            style: const TextStyle(fontSize: 12, color: Colors.black54),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    leading: CircleAvatar(backgroundColor: Colors.grey),
-                                    trailing: selected
-                                        ? const Icon(Icons.check, color: Colors.green)
-                                        : null,
-                                    initiallyExpanded: showOtherExpanded,
-                                    onExpansionChanged: (expanded) {
-                                      setState(() { showOtherExpanded = expanded; });
-                                    },
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 8.0),
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
+                                          leading: CircleAvatar(backgroundColor: Colors.grey),
+                                          trailing: selected
+                                              ? const Icon(Icons.check, color: Colors.green)
+                                              : null,
+                                          initiallyExpanded: showOtherExpanded,
+                                          onExpansionChanged: (expanded) {
+                                            setState(() { showOtherExpanded = expanded; });
+                                          },
                                           children: [
-                                            ...otherTags.map((ot) => Column(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  children: [
-                                                    ListTile(
-                                                      dense: true,
-                                                      title: Text(
-                                                        ot.tag,
-                                                        overflow: TextOverflow.ellipsis,
-                                                        style: const TextStyle(fontSize: 13),
-                                                      ),
-                                                      leading: const SizedBox(width: 32),
-                                                      trailing: Text(ot.count.toString(), style: const TextStyle(fontSize: 12)),
-                                                    ),
-                                                    // Divider eliminado
-                                                  ],
-                                                )),
+                                            Padding(
+                                              padding: const EdgeInsets.only(top: 8.0),
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  ...filteredOtherTags.map((ot) => Column(
+                                                        mainAxisSize: MainAxisSize.min,
+                                                        children: [
+                                                          ListTile(
+                                                            dense: true,
+                                                            title: Text(
+                                                              ot.tag,
+                                                              overflow: TextOverflow.ellipsis,
+                                                              style: const TextStyle(fontSize: 13),
+                                                            ),
+                                                            leading: const SizedBox(width: 32),
+                                                            trailing: Text(ot.count.toString(), style: const TextStyle(fontSize: 12)),
+                                                          ),
+                                                        ],
+                                                      )),
+                                                ],
+                                              ),
+                                            ),
                                           ],
-                                        ),
-                                      ),
-                                    ],
-                                    // onTap y selected solo en ListTile, no ExpansionTile
-                                  );
-                                }
-                              }),
+                                        );
+                                      }
+                                    }),
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
                         ),
