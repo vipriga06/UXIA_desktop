@@ -29,7 +29,7 @@ class AppConstants {
   // Mensajes
   static const String msgEmptyFields = 'Per favor, omple tots els camps';
   static const String msgInvalidEmail =
-      'Email invàlid. Exemple: usuari@exemple.com';
+      'El correu electrònic no és vàlid. Si us plau, revisa el format (exemple: usuari@exemple.com)';
   static const String msgInvalidUrl =
       'Format d\'URL invàlid. Exemple: uxia3.ieti.site';
   static const String msgServerError = 'No es pot connectar al servidor';

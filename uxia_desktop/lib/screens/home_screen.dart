@@ -5,6 +5,7 @@ import '../services/api_service.dart';
 import '../services/auth_service.dart';
 import '../services/settings_manager.dart';
 import '../widgets/common_widgets.dart';
+import '../utils/validators.dart';
 import 'login_screen.dart';
 import 'tag_stats_screen.dart';
 
@@ -258,51 +259,137 @@ class _UsersScreenState extends State<_UsersScreen> {
     final passwordCtrl = TextEditingController();
     final phoneCtrl = TextEditingController();
 
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Crear Usuari'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: emailCtrl,
-                decoration: const InputDecoration(labelText: 'Email'),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: nicknameCtrl,
-                decoration: const InputDecoration(labelText: 'Nom d\'usuari'),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: passwordCtrl,
-                obscureText: true,
-                decoration: const InputDecoration(labelText: 'Contrasenya'),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: phoneCtrl,
-                decoration: const InputDecoration(labelText: 'Telèfon'),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel·lar'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Crear'),
-          ),
-        ],
-      ),
-    );
+    bool emailValid = false;
+    bool nicknameValid = false;
+    bool passwordValid = false;
+    bool phoneValid = false;
 
-    if (result != true) return;
+    await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            void validate() {
+              setState(() {
+                emailValid = Validators.isValidEmail(emailCtrl.text);
+                nicknameValid = nicknameCtrl.text.trim().isNotEmpty;
+                passwordValid = passwordCtrl.text.length >= 6;
+                phoneValid = Validators.isValidPhone(phoneCtrl.text);
+              });
+            }
+            final allValid = emailValid && nicknameValid && passwordValid && phoneValid;
+            return AlertDialog(
+              title: const Text('Crear Usuari'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: emailCtrl,
+                      decoration: InputDecoration(
+                        labelText: 'Email',
+                        errorText: emailCtrl.text.isEmpty || emailValid ? null : AppConstants.msgInvalidEmail,
+                        border: OutlineInputBorder(),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: emailValid || emailCtrl.text.isEmpty ? Colors.blue : Colors.red),
+                        ),
+                      ),
+                      keyboardType: TextInputType.emailAddress,
+                      onChanged: (_) => validate(),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: nicknameCtrl,
+                      decoration: InputDecoration(
+                        labelText: 'Nom d\'usuari',
+                        errorText: nicknameCtrl.text.isEmpty || nicknameValid ? null : 'El nom d\'usuari és obligatori',
+                        border: OutlineInputBorder(),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: nicknameValid || nicknameCtrl.text.isEmpty ? Colors.blue : Colors.red),
+                        ),
+                      ),
+                      onChanged: (_) => validate(),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: passwordCtrl,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: 'Contrasenya',
+                        errorText: passwordCtrl.text.isEmpty || passwordValid ? null : 'La contrasenya ha de tenir almenys 6 caràcters',
+                        border: OutlineInputBorder(),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: passwordValid || passwordCtrl.text.isEmpty ? Colors.blue : Colors.red),
+                        ),
+                      ),
+                      onChanged: (_) => validate(),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: phoneCtrl,
+                      decoration: InputDecoration(
+                        labelText: 'Telèfon',
+                        errorText: phoneCtrl.text.isEmpty || phoneValid ? null : 'El telèfon no és vàlid',
+                        border: OutlineInputBorder(),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: phoneValid || phoneCtrl.text.isEmpty ? Colors.blue : Colors.red),
+                        ),
+                      ),
+                      keyboardType: TextInputType.phone,
+                      onChanged: (_) => validate(),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text('Cancel·lar'),
+                ),
+                ElevatedButton(
+                  onPressed: allValid ? () => Navigator.pop(context, true) : null,
+                  child: const Text('Crear'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    ).then((result) async {
+      if (result != true) return;
+      try {
+        final user = await _apiService.createUser(
+          email: emailCtrl.text,
+          nickname: nicknameCtrl.text,
+          password: passwordCtrl.text,
+          telefon: phoneCtrl.text,
+        );
+        await _loadData();
+
+        if (mounted) {
+          if (user != null) {
+            await CommonWidgets.showInfoDialog(
+              context: context,
+              title: 'Usuari creat',
+              message: 'Usuari creat correctament. Rebràs un SMS amb el codi de validació. El nou usuari no apareixerà a la llista fins que es valide.',
+            );
+          } else {
+            await CommonWidgets.showErrorDialog(
+              context: context,
+              message: 'El servidor no ha creat el usuari. Revisa los datos o consulta los logs del backend.',
+            );
+          }
+        }
+      } catch (e) {
+        if (mounted) {
+          await CommonWidgets.showErrorDialog(
+            context: context,
+            message: 'Error creant usuari: $e',
+          );
+        }
+      }
+    });
 
     try {
       final user = await _apiService.createUser(
