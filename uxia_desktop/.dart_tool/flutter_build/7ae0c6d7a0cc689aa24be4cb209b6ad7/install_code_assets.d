@@ -1,0 +1,1 @@
+ /Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/flutter_build/7ae0c6d7a0cc689aa24be4cb209b6ad7/native_assets.json:  /Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/objective_c.dylib

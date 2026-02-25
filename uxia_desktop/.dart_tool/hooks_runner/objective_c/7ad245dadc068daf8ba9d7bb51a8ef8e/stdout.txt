@@ -1,0 +1,58 @@
+Running `(cd /Users/victorp./.pub-cache/hosted/pub.dev/objective_c-9.3.0/; HOME=/Users/victorp. TMPDIR=/var/folders/n_/jxv3mx9d545cjgkg9q2ftk840000gn/T/ ANDROID_HOME=/Users/victorp./Library/Android/sdk PATH=/opt/homebrew/opt/openjdk@21/bin:/Users/victorp./Library/Application Support/Code/User/globalStorage/github.copilot-chat/debugCommand:/Users/victorp./Library/Application Support/Code/User/globalStorage/github.copilot-chat/copilotCli:/Applications/flutter/bin/:/opt/local/bin:/opt/local/sbin:/Library/Frameworks/Python.framework/Versions/3.15/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/opt/X11/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/opt/homebrew/bin:/Applications/flutter/bin/:/Users/victorp./Library/Application Support/Code/User/globalStorage/github.copilot-chat/debugCommand:/Users/victorp./Library/Application Support/Code/User/globalStorage/github.copilot-chat/copilotCli:/opt/homebrew/opt/openjdk@21/bin:/opt/local/bin:/opt/local/sbin:/Library/Frameworks/Python.framework/Versions/3.15/bin:/Users/victorp./Library/Android/sdk/tools:/Users/victorp./Library/Android/sdk/platform-tools:/Users/victorp./.vscode/extensions/ms-python.debugpy-2025.18.0-darwin-arm64/bundled/scripts/noConfigScripts:/Users/victorp./Library/Android/sdk/tools:/Users/victorp./Library/Android/sdk/platform-tools /Applications/flutter/bin/cache/dart-sdk/bin/dart --packages=/Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/package_config.json /Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/hooks_runner/objective_c/7ad245dadc068daf8ba9d7bb51a8ef8e/hook.dill --config=/Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/hooks_runner/objective_c/7ad245dadc068daf8ba9d7bb51a8ef8e/input.json )`.
+INFO: 2026-02-20 15:34:38.923095: Running `/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang --version`.
+
+INFO: 2026-02-20 15:34:38.936027: Running `/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang --version`.
+
+INFO: 2026-02-20 15:34:38.949557: Running: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -target arm64-apple-darwin -mmacos-version-min=13 -c /Users/victorp./.pub-cache/hosted/pub.dev/objective_c-9.3.0/src/include/dart_api_dl.c -fpic -I src -o /Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/include/dart_api_dl.c.o
+
+INFO: 2026-02-20 15:34:38.950025: Running: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -target arm64-apple-darwin -mmacos-version-min=13 -c /Users/victorp./.pub-cache/hosted/pub.dev/objective_c-9.3.0/src/objective_c.c -fpic -I src -o /Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/objective_c.c.o
+
+INFO: 2026-02-20 15:34:38.950394: Running: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -target arm64-apple-darwin -mmacos-version-min=13 -x objective-c -fobjc-arc -c /Users/victorp./.pub-cache/hosted/pub.dev/objective_c-9.3.0/src/objective_c.m -fpic -I src -o /Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/objective_c.m.o
+
+ng: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -target arm64-apple-darwin -mmacos-version-min=13 -x objective-c -fobjc-arc -c /Users/victorp./.pub-cache/hosted/pub.dev/objective_c-9.3.0/src/input_stream_adapter.m -fpic -I src -o /Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/input_stream_adapter.m.o
+
+INFO: 2026-02-20 15:34:38.950591: Running: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -target arm64-apple-darwin -mmacos-version-min=13 -x objective-c -fobjc-arc -c /Users/victorp./.pub-cache/hosted/pub.dev/objective_c-9.3.0/src/ns_number.m -fpic -I src -o /Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/ns_number.m.o
+
+INFO: 2026-02-20 15:34:38.950689: Running: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -target arm64-apple-darwin -mmacos-version-min=13 -x objective-c -fobjc-arc -c /Users/victorp./.pub-cache/hosted/pub.dev/objective_c-9.3.0/src/protocol.m -fpic -I src -o /Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/protocol.m.o
+
+INFO: 2026-02-20 15:34:38.950798: Running: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -target arm64-apple-darwin -mmacos-version-min=13 -x objective-c -fobjc-arc -c /Users/victorp./.pub-cache/hosted/pub.dev/objective_c-9.3.0/src/objective_c_bindings_generated.m -fpic -I src -o /Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/objective_c_bindings_generated.m.o
+
+INFO: 2026-02-20 15:34:39.022349: 
+INFO: 2026-02-20 15:34:39.022561: 
+INFO: 2026-02-20 15:34:39.022625: Generated /Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/objective_c.c.o
+INFO: 2026-02-20 15:34:39.022831: 
+INFO: 2026-02-20 15:34:39.023301: 
+INFO: 2026-02-20 15:34:39.023346: Generated /Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/include/dart_api_dl.c.o
+
+INFO: 2026-02-20 15:34:39.031882: 
+INFO: 2026-02-20 15:34:39.031922: 
+INFO: 2026-02-20 15:34:39.031934: Generated /Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/test/util.c.o
+
+INFO: 2026-02-20 15:34:39.035830: 
+INFO: 2026-02-20 15:34:39.035866: 
+INFO: 2026-02-20 15:34:39.035877: Generated /Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/protocol.m.o
+
+INFO: 2026-02-20 15:34:39.040647: 
+INFO: 2026-02-20 15:34:39.040682: 
+INFO: 2026-02-20 15:34:39.040693: Generated /Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/observer.m.o
+
+INFO: 2026-02-20 15:34:39.208740: 
+INFO: 2026-02-20 15:34:39.208815: 
+INFO: 2026-02-20 15:34:39.208830: Generated /Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/ns_number.m.o
+
+INFO: 2026-02-20 15:34:39.213687: Generated /Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/objective_c.m.o
+
+INFO: 2026-02-20 15:34:39.217002: 
+INFO: 2026-02-20 15:34:39.217025: 
+INFO: 2026-02-20 15:34:39.217036: Generated /Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/input_stream_adapter.m.o
+
+INFO: 2026-02-20 15:34:39.237930: 
+INFO: 2026-02-20 15:34:39.237959: 
+INFO: 2026-02-20 15:34:39.237969: Generated /Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/objective_c_bindings_generated.m.o
+
+INFO: 2026-02-20 15:34:39.238289: Running: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -shared -Wl,-encryptable -undefined dynamic_lookup -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk -target arm64-apple-darwin -mmacos-version-min=13 /Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/include/dart_api_dl.c.o /Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/objective_c.c.o /Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/test/util.c.o /Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/input_stream_adapter.m.o /Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/objective_c.m.o /Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/observer.m.o /Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/ns_number.m.o /Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/protocol.m.o /Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/obj/src/objective_c_bindings_generated.m.o -o /Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/objective_c.dylib
+
+INFO: 2026-02-20 15:34:39.268728: 
+INFO: 2026-02-20 15:34:39.268791: 
+INFO: 2026-02-20 15:34:39.268803: Generated /Users/victorp./Documents/GitHub/UXIA_desktop/uxia_desktop/.dart_tool/hooks_runner/shared/objective_c/build/7ad245dadc/objective_c.dylib
+
